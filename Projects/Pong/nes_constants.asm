@@ -2,31 +2,33 @@
 
 ; PPU 
 
-PPU_CTRL 		= $2000
-PPU_MASK 		= $2001
-PPU_STATUS		= $2002    
-PPU_OAM_ADDR	= $2003
-PPU_OAM_DATA	= $2004
-PPU_ADDRESS		= $2006   
+PPU_CTRL 		= $2000 ; NMI enable (V), PPU master/slave (P), sprite height (H), background tile select (B), sprite tile select (S), increment mode (I), nametable select (NN)
+PPU_MASK 		= $2001 ; color emphasis (BGR), sprite enable (s), background enable (b), sprite left column enable (M), background left column enable (m), greyscale (G)
+PPU_STATUS		= $2002 ; vblank (V), sprite 0 hit (S), sprite overflow (O), read resets write pair for $2005/2006    
+PPU_OAM_ADDR	= $2003 ; OAM read/write address
+PPU_OAM_DATA	= $2004 ; OAM data read/write
+PPU_SCROLL 		= $2005 ; fine scroll position (two writes: X, Y)
+PPU_ADDRESS		= $2006 ; PPU read/write address (two writes: MSB, LSB)  
+PPU_DATA		= $2007 ; PPU data read/write
+OAM_DMA 		= $4014 ; OAM DMA high address
 
  
-; PPU_MASK = $2001
 
 ; OAM_DMA = #$02
-; PPU_SCROLL = $2005
+; 
 
 
 ;
 ; Controller Bitmasks
 ; 
-BUTTON_A		= $10000000
-BUTTON_B		= $01000000
-BUTTON_SELECT	= $00100000
+BUTTON_A		= %10000000
+BUTTON_B		= %01000000
+BUTTON_SELECT	= %00100000
 BUTTON_START 	= %00010000 
-DPAD_UP			= $00001000
-DPAD_DOWN		= $00000100
-DPAD_LEFT		= $00000010
-DPAD_RIGHT		= $00000001
+DPAD_UP			= %00001000
+DPAD_DOWN		= %00000100
+DPAD_LEFT		= %00000010
+DPAD_RIGHT		= %00000001
 
 
 ;

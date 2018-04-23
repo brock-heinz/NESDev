@@ -138,6 +138,7 @@ NMI:
   LDA #$01
   STA watch
 
+  ; DMA sprites to the PPU 
   LDA #$00
   STA $2003       ; set the low byte (00) of the RAM address
   LDA #$02
@@ -229,11 +230,11 @@ EnginePlaying:
 
 MoveBallRight:
   LDA ballright
-  BEQ MoveBallRightDone   ;;if ballright=0, skip this section
+  BEQ MoveBallRightDone		;;if ballright=0, skip this section
 
   LDA ballx
   CLC
-  ADC ballspeedx        ;;ballx position = ballx + ballspeedx
+  ADC ballspeedx        	;;ballx position = ballx + ballspeedx
   STA ballx
 
   LDA ballx
@@ -344,6 +345,26 @@ UpdateSprites:
   ;;update paddle sprites
   RTS
  
+DrawSprite:
+	LDX sprite_offset
+	; Y Pos
+	LDA sprite_ypos
+	STA $0200, x
+	INX
+	; Tile
+	LDA sprite_tile
+	STA $0200, x
+	INX
+	; Attributes
+	LDA sprite_attr
+	STA $0200, x
+	INX
+	; X Position
+	LDA sprite_xpos
+	STA $0200, x
+	INX
+	STX sprite_offset
+	RTS
  
 DrawScore:
   ;;draw score on screen using background tiles
