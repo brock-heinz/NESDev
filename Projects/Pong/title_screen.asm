@@ -1,8 +1,7 @@
 ; Pong Title Screen Logic
 
 LoadTitle:
-  LDA #$02
-  STA watch
+
 ; Turn screen off
 ;  LDA #$00
 ;  STA $2000
@@ -67,5 +66,17 @@ TickTitle:
   STA $020E  
   LDA #124		; X Pos
   STA $020F
+  
+  ; If the user has pressed start, transition to gameplay
+  LDA buttons1
+  AND #BUTTON_START
+  BNE SetStateLoadPlaying
 
   RTS
+  
+  
+SetStateLoadPlaying:
+  LDA #STATELOADPLAYING 
+  STA gamestate
+SetStateLoadPlayingDone:  
+  
