@@ -119,13 +119,30 @@ GameplayDrawSprites:
 	JSR DrawSprite
 	
 	; Draw Player 1 
-	LDA paddle1ytop
-	STA sprite_ypos
+
+	
 	LDA #$84 
 	STA sprite_tile
 	LDA #PADDLE1X
 	STA sprite_xpos
+	
+	; TODO
+	; Push value of A, X to stack before DrawSprite, then pop it back?
+	LDA paddle1ytop	
+	STA paddle_draw
+	LDY #PADDLE_SPRITES
+DrawPlayer1Loop:
+	LDA paddle_draw
+	STA sprite_ypos
 	JSR DrawSprite
+	CLC
+	LDA paddle_draw
+	ADC #$08
+	STA paddle_draw
+	DEY
+	BNE DrawPlayer1Loop
+
+
 	
 	; Draw Player 1 
 	LDA paddle2ytop

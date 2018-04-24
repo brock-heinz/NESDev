@@ -16,4 +16,7 @@ LEFTWALL       = $04
   
 PADDLE1X		= $08  ; horizontal position for paddles, doesnt move
 PADDLE2X		= $F0
-PADDLESPEED		= $01
+PADDLESPEED		= $02 ; 
+
+PADDLE_SPRITES	= $05 ; 5 sprites tall
+PADDLE_PIXLES	= $28 ; 5x8 = 40 pixels
