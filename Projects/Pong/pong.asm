@@ -12,7 +12,7 @@
 
 ;; DECLARE SOME CONSTANTS HERE
   .include "constants.asm"
-
+  .include "nes_constants.asm"
 
   
   
@@ -87,11 +87,11 @@ LoadBG:
 LoadBGOuterLoop:
   LDX #$00              ; start out at 0
 LoadBGInnerLoop:
-  LDA clearbg, x     	; load data from address (clearbg + the value in x)
+  LDA clear_tile, x     ; load data from address (clear_tile + the value in x)
   STA $2007             ; write to PPU
   INX                   ; X = X + 1
   CPX #$80              ; Compare X to hex $80, decimal 128 - copying 128 bytes
-  BNE LoadBGInnerLoop  ; Branch to LoadBackgroundLoop if compare was Not Equal to zero
+  BNE LoadBGInnerLoop   ; Branch to LoadBackgroundLoop if compare was Not Equal to zero
                         ; if compare was equal to 128, keep going down
   INY 					 
   CPY #$08               
@@ -134,6 +134,11 @@ Forever:
  
 
 NMI:
+
+  LDA #$01
+  STA watch
+
+  ; DMA sprites to the PPU 
   LDA #$00
   STA $2003       ; set the low byte (00) of the RAM address
   LDA #$02
@@ -158,28 +163,29 @@ NMI:
   JSR ReadController2  ;;get the current button data for player 2
   
 GameEngine:  
-  LDA gamestate    		; Initialization
+  LDA gamestate    		; Initialize Main Menu / Title Screen
   CMP #STATELOADTITLE
   BEQ JumpLoadTitle			
   
   LDA gamestate			;;game is displaying title screen
   CMP #STATETITLE
   BEQ JumpTickTitle    
-    
-  LDA gamestate
-  CMP #STATEGAMEOVER
-  BEQ EngineGameOver  ;;game is displaying ending screen
+
+  LDA gamestate    		; Initialize Gameplay state
+  CMP #STATELOADPLAYING
+  BEQ JumpLoadGameplay	
   
-  LDA gamestate
+  LDA gamestate			; Gameplay! 
   CMP #STATEPLAYING
-  BEQ EnginePlaying   ;;game is playing
+  BEQ JumpTickGameplay 
   
- 
+  LDA gamestate			; 
+  CMP #STATEGAMEOVER
+  BEQ EngineGameOver   
   
 GameEngineDone:  
-  
-  ;JSR UpdateSprites  ;;set ball/paddle sprites from positions
-
+  LDA #$0F
+  STA watch
   RTI             ; return from interrupt
  
  
@@ -187,11 +193,7 @@ GameEngineDone:
  
 ;;;;;;;;
 JumpLoadTitle:
-  LDA #$01
-  STA watch
   JSR LoadTitle
-  LDA #$04
-  STA watch
   JMP GameEngineDone
 JumpLoadTitleDone:
   
@@ -199,6 +201,18 @@ JumpTickTitle:
   JSR TickTitle
   JMP GameEngineDone
 JumpTickTitleDone:  
+
+JumpLoadGameplay:
+  JSR LoadGameplay
+  JMP GameEngineDone
+JumpLoadPlayingDone:
+
+JumpTickGameplay:
+  JSR TickGameplay
+  JMP GameEngineDone
+JumpTickGameplayDone:
+
+  
 
 ;;;;;;;;; 
  
@@ -216,11 +230,11 @@ EnginePlaying:
 
 MoveBallRight:
   LDA ballright
-  BEQ MoveBallRightDone   ;;if ballright=0, skip this section
+  BEQ MoveBallRightDone		;;if ballright=0, skip this section
 
   LDA ballx
   CLC
-  ADC ballspeedx        ;;ballx position = ballx + ballspeedx
+  ADC ballspeedx        	;;ballx position = ballx + ballspeedx
   STA ballx
 
   LDA ballx
@@ -310,8 +324,8 @@ CheckPaddleCollision:
   ;;      bounce, ball now moving left
 CheckPaddleCollisionDone:
 
-  JMP GameEngineDone
- 
+  RTS
+EnginePlayingDone: 
  
  
  
@@ -331,6 +345,26 @@ UpdateSprites:
   ;;update paddle sprites
   RTS
  
+DrawSprite:
+	LDX sprite_offset
+	; Y Pos
+	LDA sprite_ypos
+	STA $0200, x
+	INX
+	; Tile
+	LDA sprite_tile
+	STA $0200, x
+	INX
+	; Attributes
+	LDA sprite_attr
+	STA $0200, x
+	INX
+	; X Position
+	LDA sprite_xpos
+	STA $0200, x
+	INX
+	STX sprite_offset
+	RTS
  
 DrawScore:
   ;;draw score on screen using background tiles
@@ -338,39 +372,12 @@ DrawScore:
   RTS
  
  
- 
-ReadController1:
-  LDA #$01
-  STA $4016
-  LDA #$00
-  STA $4016
-  LDX #$08
-ReadController1Loop:
-  LDA $4016
-  LSR A            ; bit0 -> Carry
-  ROL buttons1     ; bit0 <- Carry
-  DEX
-  BNE ReadController1Loop
-  RTS
-  
-ReadController2:
-  LDA #$01
-  STA $4016
-  LDA #$00
-  STA $4016
-  LDX #$08
-ReadController2Loop:
-  LDA $4017
-  LSR A            ; bit0 -> Carry
-  ROL buttons2     ; bit0 <- Carry
-  DEX
-  BNE ReadController2Loop
-  RTS  
-  
   
 ;; Game State Logic
   .include "title_screen.asm"
-        
+  .include "controllers.asm"
+  .include "gameplay.asm"
+  
 ;;;;;;;;;;;;;;  
   
   
@@ -378,8 +385,8 @@ ReadController2Loop:
   .bank 1
   .org $E000
 palette:
-  .db $22,$29,$1A,$0F,  $22,$36,$17,$0F,  $22,$30,$21,$0F,  $22,$27,$17,$0F   ;;background palette
-  .db $22,$1C,$15,$14,  $22,$02,$38,$3C,  $22,$1C,$15,$14,  $22,$02,$38,$3C   ;;sprite palette
+  .db COLOR_BLACK,$01,$21,$31,  $22,$36,$17,$0F,  $22,$30,$21,$0F,  $22,$27,$17,$0F   ;;background palette
+  .db COLOR_BLACK,$01,$21,$31,  $22,$02,$38,$3C,  $22,$1C,$15,$14,  $22,$02,$38,$3C   ;;sprite palette
 
 sprites:
 ;     vert tile attr horiz
@@ -388,7 +395,7 @@ sprites:
   .db $88, $82, $00, $80   ;sprite 2
   .db $88, $82, $00, $88   ;sprite 3
 
-clearbg:  
+clear_tile:  
   .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 1
   .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 2
   .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 3
