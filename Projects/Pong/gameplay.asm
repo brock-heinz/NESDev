@@ -30,6 +30,10 @@ ClearSpritesLoop:
 	STA score1
 	STA score2
   
+	; Assume player 2 is cpu for now
+  	LDA #TRUE
+  	STA player2_is_cpu
+
 	; Turn on screen
   
 	LDA #%10011000   ; enable NMI, sprites from Pattern Table 1, background from Pattern Table 1
@@ -119,41 +123,41 @@ GameplayDrawSprites:
 	JSR DrawSprite
 	
 	; Draw Player 1 
-
 	
+	; Use the square block for the paddles
 	LDA #$84 
-	STA sprite_tile
+	STA sprite_tile	
+
 	LDA #PADDLE1X
 	STA sprite_xpos
-	
-	; TODO
-	; Push value of A, X to stack before DrawSprite, then pop it back?
 	LDA paddle1ytop	
-	STA paddle_draw
-	LDY #PADDLE_SPRITES
+	LDX #PADDLE_SPRITES
 DrawPlayer1Loop:
-	LDA paddle_draw
 	STA sprite_ypos
 	JSR DrawSprite
 	CLC
-	LDA paddle_draw
 	ADC #$08
-	STA paddle_draw
-	DEY
+	DEX
 	BNE DrawPlayer1Loop
 
 
 	
-	; Draw Player 1 
-	LDA paddle2ytop
-	STA sprite_ypos
+	; Draw Player 2
 	LDA #PADDLE2X
 	STA sprite_xpos
+	LDA paddle2ytop	
+	LDX #PADDLE_SPRITES
+DrawPlayer2Loop:
+	STA sprite_ypos
 	JSR DrawSprite
+	CLC
+	ADC #$08
+	DEX
+	BNE DrawPlayer2Loop
 	
 	; Draw Score for Player 1
 	
-	; Draw Scpre for Player 2
+	; Draw Score for Player 2
 	
 	
 

@@ -346,6 +346,12 @@ UpdateSprites:
   RTS
  
 DrawSprite:
+  ; Push registers we're going to mess with 
+  PHP ; Push Processor Status
+  PHA ; Push Accumulator
+  TXA ; Transfer Accumulator to X
+  PHA ; Push Accumulator (X)
+
 	LDX sprite_offset
 	; Y Pos
 	LDA sprite_ypos
@@ -364,6 +370,12 @@ DrawSprite:
 	STA $0200, x
 	INX
 	STX sprite_offset
+
+  ; Restore registers
+  PLA ; Pull Accumulator (X)
+  TAX ; Transfer Accumulator to X
+  PLA ; Pull Accumulator 
+  PLP ; Pull Processor Statu
 	RTS
  
 DrawScore:

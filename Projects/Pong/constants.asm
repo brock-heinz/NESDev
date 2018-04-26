@@ -20,3 +20,8 @@ PADDLESPEED		= $02 ;
 
 PADDLE_SPRITES	= $05 ; 5 sprites tall
 PADDLE_PIXLES	= $28 ; 5x8 = 40 pixels
+
+
+
+TRUE		= $01
+FALSE		= $00
