@@ -123,7 +123,7 @@ GameplayMoveBallRight:
 	LDA ballx
 	CMP #RIGHTWALL
 	BCC GameplayMoveBallRightDone      ;;if ball x < right wall, still on screen, skip next section
-	; Player 1 scores	
+	; Player 1 scores!	
 	LDX score1
 	INX
 	STX score1
@@ -139,15 +139,58 @@ GameplayMoveBallLeft:
 	SBC ballspeedx        ;;ballx position = ballx - ballspeedx
 	STA ballx
 
+; START PLAYER 1 PADDLE COLLISION
+
+
+; END PLAYER 1 PADDLE COLLISION
+
 	LDA ballx
 	CMP #LEFTWALL
 	BCS GameplayMoveBallLeftDone    
-	; Player 2 scores	
+	; Player 2 scores!	
 	LDX score2
 	INX
 	STX score2
 	JSR GameplayInitBall
 GameplayMoveBallLeftDone:
+
+GameplayMoveBallUp:
+  LDA ballup
+  BEQ GameplayMoveBallUpDone   ;;if ballup=0, skip this section
+
+  LDA bally
+  SEC
+  SBC ballspeedy        ;;bally position = bally - ballspeedy
+  STA bally
+
+  LDA bally
+  CMP #TOPWALL
+  BCS GameplayMoveBallUpDone      ;;if ball y > top wall, still on screen, skip next section
+  LDA #$01
+  STA balldown
+  LDA #$00
+  STA ballup         ;;bounce, ball now moving down
+GameplayMoveBallUpDone:
+
+
+GameplayMoveBallDown:
+  LDA balldown
+  BEQ GameplayMoveBallDownDone   ;;if ballup=0, skip this section
+
+  LDA bally
+  CLC
+  ADC ballspeedy        ;;bally position = bally + ballspeedy
+  STA bally
+
+  LDA bally
+  CMP #BOTTOMWALL
+  BCC GameplayMoveBallDownDone      ;;if ball y < bottom wall, still on screen, skip next section
+  LDA #$00
+  STA balldown
+  LDA #$01
+  STA ballup         ;;bounce, ball now moving down
+GameplayMoveBallDownDone:
+
 	
 GameplayMoveBallDone:
 	RTS
