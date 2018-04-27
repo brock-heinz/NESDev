@@ -24,3 +24,7 @@ sprite_xpos		.rs 1 ; sprite X position
 sprite_ypos		.rs 1 ; sprite Y position
 sprite_attr		.rs 1 ; sprite attributes
 sprite_tile		.rs 1 ; sprite tile address
+
+
+
+random_seed: .rs 2       ; initialize 16-bit seed to any value except 0

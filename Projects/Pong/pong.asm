@@ -384,6 +384,27 @@ DrawScore:
   RTS
  
  
+; Returns a random 8-bit number in A (0-255)
+; http://wiki.nesdev.com/w/index.php/Random_number_generator
+; Random8:
+;  TXA ; Transfer Accumulator to X
+;  PHA ; Push Accumulator (X)
+;
+;  LDX #8     ; iteration count (generates 8 bits)
+;  LDA random_seed+0
+;  ASL        ; shift the register
+;  ROL random_seed+1
+;  BCC :+
+;  EOR #$2D   ; apply XOR feedback whenever a 1 bit is shifted out
+;  DEX
+;  BNE :--
+;  STA random_seed+0
+;  CMP #0     ; reload flags
+;
+;  PLA ; Pull Accumulator (X)
+;  TAX ; Transfer Accumulator to X
+;  RTS
+
   
 ;; Game State Logic
   .include "title_screen.asm"

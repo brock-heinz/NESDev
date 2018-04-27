@@ -1,5 +1,10 @@
 ; NES Constants
 
+
+TRUE		= $01
+FALSE		= $00
+
+
 ; PPU 
 
 PPU_CTRL 		= $2000 ; NMI enable (V), PPU master/slave (P), sprite height (H), background tile select (B), sprite tile select (S), increment mode (I), nametable select (NN)

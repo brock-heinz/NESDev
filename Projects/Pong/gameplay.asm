@@ -34,6 +34,9 @@ ClearSpritesLoop:
   	LDA #TRUE
   	STA player2_is_cpu
 
+  	; Init ball motion
+  	JSR GameplayInitBall
+
 	; Turn on screen
   
 	LDA #%10011000   ; enable NMI, sprites from Pattern Table 1, background from Pattern Table 1
@@ -47,6 +50,25 @@ ClearSpritesLoop:
 LoadGameplayDone:	
 	RTS
 
+
+GameplayInitBall:
+	LDA #$01
+	STA balldown
+	STA ballleft
+	LDA #$00
+	STA ballup
+	STA ballright
+	  
+	LDA #$50
+	STA bally
+	  
+	LDA #$80
+	STA ballx
+	  
+	LDA #BALL_SPEED
+	STA ballspeedx
+	STA ballspeedy
+	RTS
 
 
 
@@ -80,6 +102,8 @@ SkipMoveDown:
 	STA paddle1ytop
 SkipMoveUp:
 
+	; TODO check for CPU or controller for player 2
+
 GameplayMovePaddlesDone:
 	RTS
 
@@ -87,6 +111,44 @@ GameplayMovePaddlesDone:
 
 GameplayMoveBall:
 
+GameplayMoveBallRight:
+	LDA ballright
+	BEQ GameplayMoveBallRightDone		;;if ballright=0, skip this section
+
+	LDA ballx
+	CLC
+	ADC ballspeedx        	;;ballx position = ballx + ballspeedx
+	STA ballx
+
+	LDA ballx
+	CMP #RIGHTWALL
+	BCC GameplayMoveBallRightDone      ;;if ball x < right wall, still on screen, skip next section
+	; Player 1 scores	
+	LDX score1
+	INX
+	STX score1
+	JSR GameplayInitBall
+GameplayMoveBallRightDone:
+
+GameplayMoveBallLeft:
+	LDA ballleft
+	BEQ GameplayMoveBallLeftDone		
+
+	LDA ballx
+	SEC
+	SBC ballspeedx        ;;ballx position = ballx - ballspeedx
+	STA ballx
+
+	LDA ballx
+	CMP #LEFTWALL
+	BCS GameplayMoveBallLeftDone    
+	; Player 2 scores	
+	LDX score2
+	INX
+	STX score2
+	JSR GameplayInitBall
+GameplayMoveBallLeftDone:
+	
 GameplayMoveBallDone:
 	RTS
 
@@ -156,9 +218,35 @@ DrawPlayer2Loop:
 	BNE DrawPlayer2Loop
 	
 	; Draw Score for Player 1
+	LDA #$10
+	STA sprite_ypos
+	LDA #$20
+	STA sprite_xpos
+
+	LDA score1
+	CLC
+	ADC #$30
+	STA sprite_tile
+	LDA #$00
+	STA sprite_attr
+
+	JSR DrawSprite
 	
+
 	; Draw Score for Player 2
-	
+	LDA #$10
+	STA sprite_ypos
+	LDA #$D0
+	STA sprite_xpos
+
+	LDA score2
+	CLC
+	ADC #$30
+	STA sprite_tile
+	LDA #$00
+	STA sprite_attr
+
+	JSR DrawSprite
 	
 
 GameplayDrawSpritesDone:

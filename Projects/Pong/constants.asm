@@ -14,14 +14,11 @@ BOTTOMWALL     = $E0
 LEFTWALL       = $04
   
   
-PADDLE1X		= $08  ; horizontal position for paddles, doesnt move
+PADDLE1X		= $08 ; horizontal position for paddles, doesnt move
 PADDLE2X		= $F0
 PADDLESPEED		= $02 ; 
 
 PADDLE_SPRITES	= $05 ; 5 sprites tall
-PADDLE_PIXLES	= $28 ; 5x8 = 40 pixels
+PADDLE_HEIGHT	= $28 ; 5x8 = 40 pixels
 
-
-
-TRUE		= $01
-FALSE		= $00
+BALL_SPEED		= $01
