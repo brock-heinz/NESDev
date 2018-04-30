@@ -84,25 +84,47 @@ TickGameplayDone:
 
 
 GameplayMovePaddles:
+
+	; Player 1 controller movement
 	LDA buttons1
 	AND #DPAD_DOWN
-	BEQ SkipMoveDown
+	BEQ SkipP1MoveDown
 	LDA paddle1ytop
 	CLC
-	ADC #PADDLESPEED
+	ADC #PADDLE_SPEED
 	STA paddle1ytop
-SkipMoveDown:
+SkipP1MoveDown:
 
 	LDA buttons1
 	AND #DPAD_UP
-	BEQ SkipMoveUp
+	BEQ SkipP1MoveUp
 	LDA paddle1ytop
 	SEC
-	SBC #PADDLESPEED  
+	SBC #PADDLE_SPEED  
 	STA paddle1ytop
-SkipMoveUp:
+SkipP1MoveUp:
 
 	; TODO check for CPU or controller for player 2
+	
+	; Player 2 controller movement
+	LDA buttons2
+	AND #DPAD_DOWN
+	BEQ SkipP2MoveDown
+	LDA paddle2ytop
+	CLC
+	ADC #PADDLE_SPEED
+	STA paddle2ytop
+SkipP2MoveDown:
+
+	LDA buttons2
+	AND #DPAD_UP
+	BEQ SkipP2MoveUp
+	LDA paddle2ytop
+	SEC
+	SBC #PADDLE_SPEED  
+	STA paddle2ytop
+SkipP2MoveUp:
+
 
 GameplayMovePaddlesDone:
 	RTS
@@ -120,6 +142,35 @@ GameplayMoveBallRight:
 	ADC ballspeedx        	;;ballx position = ballx + ballspeedx
 	STA ballx
 
+	; PLAYER2 PADDLE COLLISION
+	; We are going to test the center right point of the ball sprite against the
+	; 'box' formed by the paddle. 
+	LDA ballx
+	CLC
+	ADC #BALL_SIZE
+	CMP #PADDLE2X	 			; Carry flag is set if A(bally+BALL_SIZE) >= M (#PADDLE2X)
+	BCC Player2NoBallCollision 	; If the right side of the paddle is < than PADDLE2X, we're done 
+	CMP #PADDLE2XR 				; Carry flag is set if A(bally+BALL_SIZE) >= M (#PADDLE2XR)
+	BCS Player2NoBallCollision 	; If the right side of the ball is >= than PADDLE2XR, we're done
+	
+	LDA bally
+	CLC
+	ADC #BALL_SIZE				; We want the bottom of the ball
+	CMP paddle2ytop				; Carry flag is set if (bally+BALL_SIZE) >= M (paddle2ytop)
+	BCC Player2NoBallCollision	; If the bottom of the ball is < the top of the paddle, we're done
+	LDA paddle2ytop
+	ADC #PADDLE_HEIGHT
+	CMP bally					; Carry flag set if (paddle2ytop+PADDLE_HEIGHT) >= bally
+	BCC Player2NoBallCollision 	; If the bottom of the paddle is < top of the ball, we're done
+	
+	
+	; The ball has collided with the paddle, so bounce it!
+	LDA #$01
+	STA ballleft
+	LDA #$00
+	STA ballright
+Player2NoBallCollision:
+	
 	LDA ballx
 	CMP #RIGHTWALL
 	BCC GameplayMoveBallRightDone      ;;if ball x < right wall, still on screen, skip next section
@@ -139,10 +190,35 @@ GameplayMoveBallLeft:
 	SBC ballspeedx        ;;ballx position = ballx - ballspeedx
 	STA ballx
 
-; START PLAYER 1 PADDLE COLLISION
+	; PLAYER 1 PADDLE COLLISION
+	; We are going to test the center left point of the ball sprite against the
+	; 'box' formed by the paddle. 
+	LDA #PADDLE1X
+	CMP ballx	; Compare PADDLE1X to ballx, Carry flag is set if A >= M
+	BCS Player1NoBallCollision ; If the left side of the ball is to the left of the left side the paddle, we're done
+	CLC
+	ADC #PADDLE_WIDTH
+	CMP ballx	; Compare PADDLE1X+PADDLE_WIDTH to ballx, Carry flag is set if A >= M
+	BCC Player1NoBallCollision ; If the left side of the ball is not to the left of the right side the paddle, we're done
 
+	LDA bally
+	CLC
+	ADC #BALL_SIZE
+	CMP paddle1ytop				; compare the bottom of the ball with the top of the paddle, carry flag is set if  A >= M
+	BCC Player1NoBallCollision	; If the carry flag is clear, then the ball is above the paddle on screen
+	LDA paddle1ytop
+	CLC
+	ADC #PADDLE_HEIGHT
+	CMP bally					; compare the top of the ball with the bottom of the paddle, carry flag is set if  A >= M
+	BCC Player1NoBallCollision	; If the carry flag is clear, then the ball is below the paddle on screen
+	
+	; The ball has collided with the paddle, so bounce it!
+	LDA #$00
+	STA ballleft
+	LDA #$01
+	STA ballright
+Player1NoBallCollision:
 
-; END PLAYER 1 PADDLE COLLISION
 
 	LDA ballx
 	CMP #LEFTWALL

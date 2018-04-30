@@ -26,5 +26,4 @@ sprite_attr		.rs 1 ; sprite attributes
 sprite_tile		.rs 1 ; sprite tile address
 
 
-
 random_seed: .rs 2       ; initialize 16-bit seed to any value except 0
