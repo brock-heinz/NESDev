@@ -4,18 +4,13 @@
 
 LoadGameplay:
 
-  ; Turn off screen
+	; Turn off screen
     LDA #$00 
     STA PPU_CTRL
     STA PPU_MASK
 
-  ; Clear old sprite data
-	LDX #$FF
-	LDA #$00
-ClearSpritesLoop:
-	STA $0200, x
-	DEX 
-	BNE ClearSpritesLoop
+	; Clear old sprite data
+	JSR ClearSprites
   
 	; Load background	
   

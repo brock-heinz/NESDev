@@ -8,9 +8,9 @@ STATELOADPLAYING     	= $04  ;
 STATELOADGAMEOVER		= $05  ;  
 
   
-RIGHTWALL      = $F4  ; when ball reaches one of these, do something
-TOPWALL        = $20
-BOTTOMWALL     = $E0
+RIGHTWALL      = $F4  	; when ball reaches one of these, do something
+TOPWALL        = $20	; 32 pixels / 4 tiles
+BOTTOMWALL     = $E0	; 16 pixels / 2 tiles
 LEFTWALL       = $04
   
   
