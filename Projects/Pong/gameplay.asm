@@ -4,18 +4,13 @@
 
 LoadGameplay:
 
-  ; Turn off screen
+	; Turn off screen
     LDA #$00 
     STA PPU_CTRL
     STA PPU_MASK
 
-  ; Clear old sprite data
-	LDX #$FF
-	LDA #$00
-ClearSpritesLoop:
-	STA $0200, x
-	DEX 
-	BNE ClearSpritesLoop
+	; Clear old sprite data
+	JSR ClearSprites
   
 	; Load background	
   
@@ -30,6 +25,13 @@ ClearSpritesLoop:
 	STA score1
 	STA score2
   
+	; Assume player 2 is cpu for now
+  	LDA #TRUE
+  	STA player2_is_cpu
+
+  	; Init ball motion
+  	JSR GameplayInitBall
+
 	; Turn on screen
   
 	LDA #%10011000   ; enable NMI, sprites from Pattern Table 1, background from Pattern Table 1
@@ -43,6 +45,25 @@ ClearSpritesLoop:
 LoadGameplayDone:	
 	RTS
 
+
+GameplayInitBall:
+	LDA #$01
+	STA balldown
+	STA ballleft
+	LDA #$00
+	STA ballup
+	STA ballright
+	  
+	LDA #$50
+	STA bally
+	  
+	LDA #$80
+	STA ballx
+	  
+	LDA #BALL_SPEED
+	STA ballspeedx
+	STA ballspeedy
+	RTS
 
 
 
@@ -58,23 +79,47 @@ TickGameplayDone:
 
 
 GameplayMovePaddles:
+
+	; Player 1 controller movement
 	LDA buttons1
 	AND #DPAD_DOWN
-	BEQ SkipMoveDown
+	BEQ SkipP1MoveDown
 	LDA paddle1ytop
 	CLC
-	ADC #PADDLESPEED
+	ADC #PADDLE_SPEED
 	STA paddle1ytop
-SkipMoveDown:
+SkipP1MoveDown:
 
 	LDA buttons1
 	AND #DPAD_UP
-	BEQ SkipMoveUp
+	BEQ SkipP1MoveUp
 	LDA paddle1ytop
 	SEC
-	SBC #PADDLESPEED  
+	SBC #PADDLE_SPEED  
 	STA paddle1ytop
-SkipMoveUp:
+SkipP1MoveUp:
+
+	; TODO check for CPU or controller for player 2
+	
+	; Player 2 controller movement
+	LDA buttons2
+	AND #DPAD_DOWN
+	BEQ SkipP2MoveDown
+	LDA paddle2ytop
+	CLC
+	ADC #PADDLE_SPEED
+	STA paddle2ytop
+SkipP2MoveDown:
+
+	LDA buttons2
+	AND #DPAD_UP
+	BEQ SkipP2MoveUp
+	LDA paddle2ytop
+	SEC
+	SBC #PADDLE_SPEED  
+	STA paddle2ytop
+SkipP2MoveUp:
+
 
 GameplayMovePaddlesDone:
 	RTS
@@ -83,6 +128,141 @@ GameplayMovePaddlesDone:
 
 GameplayMoveBall:
 
+GameplayMoveBallRight:
+	LDA ballright
+	BEQ GameplayMoveBallRightDone		;;if ballright=0, skip this section
+
+	LDA ballx
+	CLC
+	ADC ballspeedx        	;;ballx position = ballx + ballspeedx
+	STA ballx
+
+	; PLAYER2 PADDLE COLLISION
+	; We are going to test the center right point of the ball sprite against the
+	; 'box' formed by the paddle. 
+	LDA ballx
+	CLC
+	ADC #BALL_SIZE
+	CMP #PADDLE2X	 			; Carry flag is set if A(bally+BALL_SIZE) >= M (#PADDLE2X)
+	BCC Player2NoBallCollision 	; If the right side of the paddle is < than PADDLE2X, we're done 
+	CMP #PADDLE2XR 				; Carry flag is set if A(bally+BALL_SIZE) >= M (#PADDLE2XR)
+	BCS Player2NoBallCollision 	; If the right side of the ball is >= than PADDLE2XR, we're done
+	
+	LDA bally
+	CLC
+	ADC #BALL_SIZE				; We want the bottom of the ball
+	CMP paddle2ytop				; Carry flag is set if (bally+BALL_SIZE) >= M (paddle2ytop)
+	BCC Player2NoBallCollision	; If the bottom of the ball is < the top of the paddle, we're done
+	LDA paddle2ytop
+	ADC #PADDLE_HEIGHT
+	CMP bally					; Carry flag set if (paddle2ytop+PADDLE_HEIGHT) >= bally
+	BCC Player2NoBallCollision 	; If the bottom of the paddle is < top of the ball, we're done
+	
+	
+	; The ball has collided with the paddle, so bounce it!
+	LDA #$01
+	STA ballleft
+	LDA #$00
+	STA ballright
+Player2NoBallCollision:
+	
+	LDA ballx
+	CMP #RIGHTWALL
+	BCC GameplayMoveBallRightDone      ;;if ball x < right wall, still on screen, skip next section
+	; Player 1 scores!	
+	LDX score1
+	INX
+	STX score1
+	JSR GameplayInitBall
+GameplayMoveBallRightDone:
+
+GameplayMoveBallLeft:
+	LDA ballleft
+	BEQ GameplayMoveBallLeftDone		
+
+	LDA ballx
+	SEC
+	SBC ballspeedx        ;;ballx position = ballx - ballspeedx
+	STA ballx
+
+	; PLAYER 1 PADDLE COLLISION
+	; We are going to test the center left point of the ball sprite against the
+	; 'box' formed by the paddle. 
+	LDA #PADDLE1X
+	CMP ballx	; Compare PADDLE1X to ballx, Carry flag is set if A >= M
+	BCS Player1NoBallCollision ; If the left side of the ball is to the left of the left side the paddle, we're done
+	CLC
+	ADC #PADDLE_WIDTH
+	CMP ballx	; Compare PADDLE1X+PADDLE_WIDTH to ballx, Carry flag is set if A >= M
+	BCC Player1NoBallCollision ; If the left side of the ball is not to the left of the right side the paddle, we're done
+
+	LDA bally
+	CLC
+	ADC #BALL_SIZE
+	CMP paddle1ytop				; compare the bottom of the ball with the top of the paddle, carry flag is set if  A >= M
+	BCC Player1NoBallCollision	; If the carry flag is clear, then the ball is above the paddle on screen
+	LDA paddle1ytop
+	CLC
+	ADC #PADDLE_HEIGHT
+	CMP bally					; compare the top of the ball with the bottom of the paddle, carry flag is set if  A >= M
+	BCC Player1NoBallCollision	; If the carry flag is clear, then the ball is below the paddle on screen
+	
+	; The ball has collided with the paddle, so bounce it!
+	LDA #$00
+	STA ballleft
+	LDA #$01
+	STA ballright
+Player1NoBallCollision:
+
+
+	LDA ballx
+	CMP #LEFTWALL
+	BCS GameplayMoveBallLeftDone    
+	; Player 2 scores!	
+	LDX score2
+	INX
+	STX score2
+	JSR GameplayInitBall
+GameplayMoveBallLeftDone:
+
+GameplayMoveBallUp:
+  LDA ballup
+  BEQ GameplayMoveBallUpDone   ;;if ballup=0, skip this section
+
+  LDA bally
+  SEC
+  SBC ballspeedy        ;;bally position = bally - ballspeedy
+  STA bally
+
+  LDA bally
+  CMP #TOPWALL
+  BCS GameplayMoveBallUpDone      ;;if ball y > top wall, still on screen, skip next section
+  LDA #$01
+  STA balldown
+  LDA #$00
+  STA ballup         ;;bounce, ball now moving down
+GameplayMoveBallUpDone:
+
+
+GameplayMoveBallDown:
+  LDA balldown
+  BEQ GameplayMoveBallDownDone   ;;if ballup=0, skip this section
+
+  LDA bally
+  CLC
+  ADC ballspeedy        ;;bally position = bally + ballspeedy
+  STA bally
+
+  LDA bally
+  CMP #BOTTOMWALL
+  BCC GameplayMoveBallDownDone      ;;if ball y < bottom wall, still on screen, skip next section
+  LDA #$00
+  STA balldown
+  LDA #$01
+  STA ballup         ;;bounce, ball now moving down
+GameplayMoveBallDownDone:
+
+	
 GameplayMoveBallDone:
 	RTS
 
@@ -119,25 +299,68 @@ GameplayDrawSprites:
 	JSR DrawSprite
 	
 	; Draw Player 1 
-	LDA paddle1ytop
-	STA sprite_ypos
+	
+	; Use the square block for the paddles
 	LDA #$84 
-	STA sprite_tile
+	STA sprite_tile	
+
 	LDA #PADDLE1X
 	STA sprite_xpos
-	JSR DrawSprite
-	
-	; Draw Player 1 
-	LDA paddle2ytop
+	LDA paddle1ytop	
+	LDX #PADDLE_SPRITES
+DrawPlayer1Loop:
 	STA sprite_ypos
+	JSR DrawSprite
+	CLC
+	ADC #$08
+	DEX
+	BNE DrawPlayer1Loop
+
+
+	
+	; Draw Player 2
 	LDA #PADDLE2X
 	STA sprite_xpos
+	LDA paddle2ytop	
+	LDX #PADDLE_SPRITES
+DrawPlayer2Loop:
+	STA sprite_ypos
 	JSR DrawSprite
+	CLC
+	ADC #$08
+	DEX
+	BNE DrawPlayer2Loop
 	
 	; Draw Score for Player 1
+	LDA #$10
+	STA sprite_ypos
+	LDA #$20
+	STA sprite_xpos
+
+	LDA score1
+	CLC
+	ADC #$30
+	STA sprite_tile
+	LDA #$00
+	STA sprite_attr
+
+	JSR DrawSprite
 	
-	; Draw Scpre for Player 2
-	
+
+	; Draw Score for Player 2
+	LDA #$10
+	STA sprite_ypos
+	LDA #$D0
+	STA sprite_xpos
+
+	LDA score2
+	CLC
+	ADC #$30
+	STA sprite_tile
+	LDA #$00
+	STA sprite_attr
+
+	JSR DrawSprite
 	
 
 GameplayDrawSpritesDone:

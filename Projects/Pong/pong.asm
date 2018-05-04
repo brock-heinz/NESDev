@@ -144,8 +144,6 @@ NMI:
   LDA #$02
   STA $4014       ; set the high byte (02) of the RAM address, start the transfer
 
-  JSR DrawScore
-
   ;;This is the PPU clean up section, so rendering the next frame starts properly.
   ;LDA #%10010000   ; enable NMI, sprites from Pattern Table 0, background from Pattern Table 1
   LDA #%10011000   ; enable NMI, sprites from Pattern Table 1, background from Pattern Table 1
@@ -346,6 +344,12 @@ UpdateSprites:
   RTS
  
 DrawSprite:
+  ; Push registers we're going to mess with 
+  PHP ; Push Processor Status
+  PHA ; Push Accumulator
+  TXA ; Transfer Accumulator to X
+  PHA ; Push Accumulator (X)
+
 	LDX sprite_offset
 	; Y Pos
 	LDA sprite_ypos
@@ -364,14 +368,45 @@ DrawSprite:
 	STA $0200, x
 	INX
 	STX sprite_offset
+
+  ; Restore registers
+  PLA ; Pull Accumulator (X)
+  TAX ; Transfer Accumulator to X
+  PLA ; Pull Accumulator 
+  PLP ; Pull Processor Statu
 	RTS
  
-DrawScore:
-  ;;draw score on screen using background tiles
-  ;;or using many sprites
-  RTS
+ClearSprites:
+	LDX #$FF
+	LDA #$00
+ClearSpritesLoop:
+	STA $0200, x
+	DEX 
+	BNE ClearSpritesLoop
+	RTS
  
  
+; Returns a random 8-bit number in A (0-255)
+; http://wiki.nesdev.com/w/index.php/Random_number_generator
+; Random8:
+;  TXA ; Transfer Accumulator to X
+;  PHA ; Push Accumulator (X)
+;
+;  LDX #8     ; iteration count (generates 8 bits)
+;  LDA random_seed+0
+;  ASL        ; shift the register
+;  ROL random_seed+1
+;  BCC :+
+;  EOR #$2D   ; apply XOR feedback whenever a 1 bit is shifted out
+;  DEX
+;  BNE :--
+;  STA random_seed+0
+;  CMP #0     ; reload flags
+;
+;  PLA ; Pull Accumulator (X)
+;  TAX ; Transfer Accumulator to X
+;  RTS
+
   
 ;; Game State Logic
   .include "title_screen.asm"
@@ -388,18 +423,32 @@ palette:
   .db COLOR_BLACK,$01,$21,$31,  $22,$36,$17,$0F,  $22,$30,$21,$0F,  $22,$27,$17,$0F   ;;background palette
   .db COLOR_BLACK,$01,$21,$31,  $22,$02,$38,$3C,  $22,$1C,$15,$14,  $22,$02,$38,$3C   ;;sprite palette
 
-sprites:
-;     vert tile attr horiz
-  .db $80, $82, $00, $80   ;sprite 0
-  .db $80, $82, $00, $88   ;sprite 1
-  .db $88, $82, $00, $80   ;sprite 2
-  .db $88, $82, $00, $88   ;sprite 3
-
-clear_tile:  
+tile_attribute: ;  Each byte covers 4x4 tiles
+  .db %00000000, %00000000, %00000000, %00000000, %00000000, %00000000, %00000000, %00000000
+  
+clear_tile:  ; 32 x 4 tiles = 128 bytes
   .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 1
   .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 2
   .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 3
   .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 4
+  
+wall_tile:  ; 32 x 4 tiles 
+  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 1
+  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 2
+  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 3
+  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 4  
+
+ceiling_tile:  ; 32 x 4 tiles 
+  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 1
+  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 2
+  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 3
+  .db $21,$82,$21,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$21,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82  ;;row 4  
+  
+floor_tile:  ; 32 x 4 tiles 
+  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 1
+  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 2
+  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 3
+  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 4    
 
   .org $FFFA     ;first of the three vectors starts here
   .dw NMI        ;when an NMI happens (once per frame if enabled) the 
