@@ -1,2 +1,2 @@
-C:\NESDev\Tools\NESASM3\NESASM3 -s pong.asm
+..\..\Tools\NESASM3\NESASM3 -s pong.asm
 pause
