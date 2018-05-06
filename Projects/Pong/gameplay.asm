@@ -301,31 +301,53 @@ GameplayDrawSprites:
 	; Draw Player 1 
 	
 	; Use the square block for the paddles
-	LDA #$84 
-	STA sprite_tile	
-
+	JSR StorePaddleSpriteTop
+	
 	LDA #PADDLE1X
 	STA sprite_xpos
 	LDA paddle1ytop	
 	LDX #PADDLE_SPRITES
+	
 DrawPlayer1Loop:
 	STA sprite_ypos
+	PHA
+	CPX #$04
+	BNE Player1DrawStage2 
+	JSR StorePaddleSpriteMid
+Player1DrawStage2:
+	CPX #$01
+	BNE Player1DrawStage3
+	JSR StorePaddleSpriteBottom
+Player1DrawStage3:
 	JSR DrawSprite
+	PLA
 	CLC
 	ADC #$08
 	DEX
 	BNE DrawPlayer1Loop
-
-
+	
+	
 	
 	; Draw Player 2
+	JSR StorePaddleSpriteTop
+	
 	LDA #PADDLE2X
 	STA sprite_xpos
-	LDA paddle2ytop	
+	LDA paddle2ytop
 	LDX #PADDLE_SPRITES
 DrawPlayer2Loop:
 	STA sprite_ypos
+	PHA
+	CPX #$04
+	BNE Player2DrawStage2 
+	JSR StorePaddleSpriteMid
+Player2DrawStage2:
+	CPX #$01
+	BNE Player2DrawStage3
+	JSR StorePaddleSpriteBottom
+Player2DrawStage3:
 	JSR DrawSprite
+	PLA
 	CLC
 	ADC #$08
 	DEX
@@ -362,7 +384,25 @@ DrawPlayer2Loop:
 
 	JSR DrawSprite
 	
-
+StorePaddleSpriteTop:
+	LDA #$01
+	STA sprite_tile
+	LDA #$00
+	STA sprite_attr
+	RTS 
+	
+StorePaddleSpriteMid:
+	LDA #$02 
+	STA sprite_tile	
+	RTS
+	
+StorePaddleSpriteBottom:
+	LDA #$01 
+	STA sprite_tile
+	LDA #%10100000
+	STA sprite_attr
+	RTS
+	
 GameplayDrawSpritesDone:
 	RTS
 

@@ -463,4 +463,4 @@ floor_tile:  ; 32 x 4 tiles
   
   .bank 2
   .org $0000
-  .incbin "sprites.chr"   ;includes 8KB graphics file from sprites.chr
+  .incbin "sprites.chr"   ;includes 8KB graphics file from pong.chr
