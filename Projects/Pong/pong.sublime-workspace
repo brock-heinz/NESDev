@@ -1,0 +1,507 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"n",
+				"None"
+			],
+			[
+				"ret",
+				"retPS4"
+			],
+			[
+				"proj",
+				"projPath"
+			],
+			[
+				"TRSLo",
+				"TRSLogInit"
+			],
+			[
+				"P4S",
+				"P4GetLatest"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "controllers.asm",
+			"settings":
+			{
+				"buffer_size": 787,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "gameplay.asm",
+			"settings":
+			{
+				"buffer_size": 4388,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "nes_constants.asm",
+			"settings":
+			{
+				"buffer_size": 3445,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "pong.asm",
+			"settings":
+			{
+				"buffer_size": 10627,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "title_screen.asm",
+			"settings":
+			{
+				"buffer_size": 3465,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "variables.asm",
+			"settings":
+			{
+				"buffer_size": 1098,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "constants.asm",
+			"settings":
+			{
+				"buffer_size": 622,
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"selected_items":
+		[
+			[
+				"Package Control: ",
+				"Package Control: Install Package"
+			],
+			[
+				"per",
+				"Perforce: Checkout"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"",
+				"Package Control: Discover Packages"
+			]
+		],
+		"width": 400.0
+	},
+	"console":
+	{
+		"height": 153.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/D/TRS_Perforce_Fears/Game/Engine/Build/BatchFiles/BuilderScripts/TRS/CreateDownloadablePackage.py",
+		"/C/NESDev/Tools/MakeCHR/setup.py",
+		"/D/TRS_Perforce_UE4Hub/Game/Engine/Build/Jenkins/jobs/fears.groovy",
+		"/D/TRS_Perforce_UE4Hub/Game/Engine/Build/Jenkins/jobs/grappa.groovy",
+		"/D/TRS_Perforce_Grappa/Audio/Grappa/WwiseProject/Actor-Mixer Hierarchy/Environment.wwu",
+		"/D/TRS_Perforce_UE4Hub/Game/Engine/Build/Jenkins/jobs/redwood.groovy",
+		"/D/TRS_Perforce_Grappa/Game/Engine/Build/Jenkins/package.groovy",
+		"/d/TRS_Perforce_UE4Hub/Game/Engine/Build/Jenkins/jobs/welldemo.groovy",
+		"/D/TRS_Perforce_UE4Hub/Game/Engine/Build/Jenkins/jobs/well.groovy",
+		"/D/TRS_Perforce_UE4Hub/Game/Engine/Plugins/Wwise/Source/AkAudio/OculusSpatializerWwise_APL.xml",
+		"/D/TRS_Perforce_Well/Game/Engine/Build/Jenkins/clean.groovy",
+		"/D/TRS_Perforce_Fears/Game/Engine/Plugins/TurtleRock/PakDownloader/Source/PakDownloader/Private/PakDownloadManager.cpp",
+		"/C/Users/brock/AppData/Local/Temp/p4v/Brock-HE7_p4.ad.turtlerockstudios.com_1666/invader/Main/Game/BuildInvader#1.py",
+		"/C/Users/brock/AppData/Local/Temp/p4v/Brock-HE7_p4.ad.turtlerockstudios.com_1666/invader/Main/Game/BuildPackages#1.py",
+		"/D/TRS_Perforce_UE4Hub/Game/Engine/Build/Jenkins/jobs/job.groovy",
+		"/D/TRS_Perforce_UE4Hub/Game/Engine/Build/Jenkins/ci-compile.groovy",
+		"/D/TRS_Perforce_Fears/Game/Engine/Build/Jenkins/clean.groovy",
+		"/D/TRS_Perforce_Well/Game/Engine/Build/Jenkins/build-zip-parallel.groovy",
+		"/D/TRS_Perforce_UE4Hub/Game/Engine/Build/Jenkins/jobs/legend.groovy",
+		"/D/TRS_Perforce_Well/Game/Engine/Build/Jenkins/ci-compile.groovy",
+		"/E/TRS_Perforce_Well/Game/Engine/Build/Jenkins/jobs/well.groovy",
+		"/E/TRS_Perforce_Well/Game/Engine/Build/Jenkins/jobs/job.groovy",
+		"/D/TRS_Perforce_UE4Hub/Game/Engine/Build/Jenkins/jobs/fearsrift.groovy",
+		"/E/TRS_Perforce_Well/Game/Engine/Build/Jenkins/jobs/fearsrift.groovy",
+		"/D/TRS_Perforce_UE4Hub/Game/Engine/Build/Jenkins/jobs/barbershop.groovy",
+		"/C/Temp/Boids Source Code/Boids Source Code/Advanced Boids/Boid.cpp",
+		"/C/Temp/Boids Source Code/Boids Source Code/Advanced Boids/Boid.h",
+		"/C/Temp/Boids Source Code/Boids Source Code/Advanced Boids/BoidCB.h",
+		"/C/Temp/Boids Source Code/Boids Source Code/Advanced Boids/BoidCB.cpp",
+		"/C/Users/brock/AppData/Local/Temp/p4v/Brock-HE7_p4.ad.turtlerockstudios.com_1666/ue4hub/Main-Hub/Game/Engine/Build/Jenkins/jobs/job#19.groovy",
+		"/C/Users/brock/AppData/Local/Temp/p4v/Brock-HE7_p4.ad.turtlerockstudios.com_1666/ue4games/Main-Legend/Game/Engine/Build/Jenkins/ci-compile#51.groovy",
+		"/C/Temp/Flock/Flock/Flock.java",
+		"/C/Temp/Flock/Flock/Food.java",
+		"/C/Temp/Flock/Flock/Bird.java",
+		"/C/Temp/Flock/Flock/Simulator.java",
+		"/C/Temp/Flock/Flock/Obstacle.java",
+		"/C/Temp/Flock/Flock/Predator.java",
+		"/E/brock/Documents/RecognitionSystemNotes.cpp",
+		"/E/Hiring/In Process/Cole Batten/Ui3dFontParser/Ui3dFontParser.cpp",
+		"/E/Hiring/In Process/Cole Batten/XOPattern/main.cpp",
+		"/E/Hiring/In Process/Cole Batten/XOPattern/XOSquarePrint.h",
+		"/E/Hiring/In Process/Cole Batten/XOPattern/XOSquarePrint.cpp",
+		"/E/Hiring/In Process/Cole Batten/DeckOCards/Deck O Cards/Card.h",
+		"/E/Hiring/In Process/Cole Batten/DeckOCards/Deck O Cards/Card.cpp",
+		"/E/Hiring/In Process/Cole Batten/DeckOCards/Deck O Cards/CardDealer.cpp",
+		"/E/Hiring/In Process/Cole Batten/DeckOCards/Deck O Cards/CardDealer.h",
+		"/E/Hiring/In Process/Cole Batten/DeckOCards/Deck O Cards/CardDeck.cpp",
+		"/E/Hiring/In Process/Cole Batten/DeckOCards/Deck O Cards/CardDeck.h",
+		"/E/Hiring/In Process/Cole Batten/DeckOCards/Deck O Cards/main.cpp",
+		"/D/TRS_Perforce_Invader/3rdParty/Drops/Scaleform/UE4/Engine/Programs/UnrealBuildTool/BuildConfiguration.xml",
+		"/C/Users/brock/Desktop/TMP/UE4Subtitles.h",
+		"/E/brock/Documents/UE4GCExamples.cpp",
+		"/C/Users/brock/AppData/Local/Temp/p4v/Brock-HE7_p4.ad.turtlerockstudios.com_1666/invader/Main/Scaleform/Invader/UI/Scripts/trs/markers/Player@=303477.as",
+		"/C/Users/brock/AppData/Local/Temp/p4v/Brock-HE7_p4.ad.turtlerockstudios.com_1666/invader/Main/Scaleform/Invader/UI/Scripts/trs/screens/Attract@=297600.as",
+		"/D/TRS_Perforce/TRS/Prototypes/UE4EVAL/BuildInvader.py",
+		"/D/TRS_Perforce/TRS/Prototypes/UE4EVAL/BuildPackages.py",
+		"/C/Users/brock/Documents/InvaderApplicationState.cpp",
+		"/d/TRS_Perforce/TRS/Prototypes/UE4EVAL/TRSNightlyBuild.bat",
+		"/d/TRS_Perforce/TRS/Prototypes/UE4EVAL/BuildInvader.py",
+		"/d/TRS_Perforce/TRS/Prototypes/UE4EVAL/BuildPackages.py",
+		"/D/TRS_Perforce/TRS/Prototypes/UE4EVAL/FixupRedirects.bat",
+		"/D/TRS_Perforce/TRS/Prototypes/UE4EVAL/trsutils.py",
+		"/d/TRS_Perforce/TRS/Prototypes/UE4EVAL/TRSBuildPackages.bat",
+		"/d/TRS_Perforce/TRS/Prototypes/UE4EVAL/TRSBuildProjectFiles.bat",
+		"/d/TRS_Perforce/TRS/Prototypes/UE4EVAL/BuildProjectFiles.py",
+		"/D/TRS_Perforce_Invader/Game/Engine/Binaries/DotNET/AutomationTool.exe.config",
+		"/D/TRS_Perforce/TRS/Prototypes/UE4EVAL/TRSBuildInvader.bat",
+		"/E/UE4_Perforce/UE4-QA/Samples/Build/ArtistSyncRules.xml",
+		"/D/TRS_Perforce/TRS/Prototypes/UE4EVAL/TRSBuildProjectFiles.bat",
+		"/D/TRS_Perforce/TRS/Prototypes/UE4EVAL/BuildProjectFiles.py",
+		"/D/TRS_Perforce/TRS/Prototypes/UE4EVAL/TRSBuildPackages.bat",
+		"/D/TRS_Perforce/TRS/Prototypes/UE4EVAL/TRSNightlyBuild.bat",
+		"/D/TRS_Perforce/TRS/Prototypes/UE4EVAL/Test.py",
+		"/C/Temp/memoryManager/memoryManager.cpp",
+		"/C/Temp/memoryManager/memoryManager.h",
+		"/D/TRS_Perforce/TRS/Prototypes/UE4EVAL/Invader/Content/WwiseAudio/Windows/Weapons.xml"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"score1",
+			"Map_Per_main",
+			"ChangesStreamName",
+			"fears",
+			"or ",
+			"and",
+			"genera",
+			"trscall",
+			"trslog",
+			"TRSCall",
+			"TRSLogInfo"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"trsutils.sysCall",
+			"trsutils.logInfo"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 1,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "controllers.asm",
+					"settings":
+					{
+						"buffer_size": 787,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "gameplay.asm",
+					"settings":
+					{
+						"buffer_size": 4388,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2106,
+								2106
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 2332.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "nes_constants.asm",
+					"settings":
+					{
+						"buffer_size": 3445,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								43,
+								43
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "pong.asm",
+					"settings":
+					{
+						"buffer_size": 10627,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								9089,
+								9089
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 8443.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "title_screen.asm",
+					"settings":
+					{
+						"buffer_size": 3465,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3436,
+								2594
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 3174.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "variables.asm",
+					"settings":
+					{
+						"buffer_size": 1098,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								715,
+								715
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "constants.asm",
+					"settings":
+					{
+						"buffer_size": 622,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								398,
+								406
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 145.0
+	},
+	"replace":
+	{
+		"height": 62.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true
+}
