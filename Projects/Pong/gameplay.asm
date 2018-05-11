@@ -88,8 +88,8 @@ GameplayMovePaddles:
 	LDA paddle1ytop
 	CLC
 	ADC #PADDLE_SPEED
-	;CMP PADDLE_LIM_BTM
-	;BCS SkipP1MoveDown
+	CMP #PADDLE_LIM_BTM
+	BCS SkipP1MoveDown
 	STA paddle1ytop
 SkipP1MoveDown:
 
@@ -99,8 +99,8 @@ SkipP1MoveDown:
 	LDA paddle1ytop
 	SEC
 	SBC #PADDLE_SPEED
-	;CMP PADDLE_LIM_TOP
-	;BCC SkipP1MoveUp	
+	CMP #PADDLE_LIM_TOP
+	BCC SkipP1MoveUp	
 	STA paddle1ytop
 SkipP1MoveUp:
 
