@@ -4,6 +4,9 @@
 *.cfg
 *.nes
 *.fns
+*.deb
+
+
 
 # Compiled source #
 ###################
