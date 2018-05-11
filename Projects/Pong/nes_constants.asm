@@ -17,10 +17,6 @@ PPU_ADDRESS		= $2006 ; PPU read/write address (two writes: MSB, LSB)
 PPU_DATA		= $2007 ; PPU data read/write
 OAM_DMA 		= $4014 ; OAM DMA high address
 
- 
-
-; OAM_DMA = #$02
-; 
 
 
 ;

@@ -68,7 +68,7 @@ LoadBackground:
 
   LDA #$00
   STA pointerLo       ; put the low byte of the address of background into pointer
-  LDA #HIGH(background)
+  LDA #HIGH(bg_nametable)
   STA pointerHi       ; put the high byte of the address into pointer
   
   LDX #$00            ; start at pointer + 0
@@ -112,34 +112,7 @@ LoadPalettesLoop:
 
 											
 						
-						
-
-;LoadBG:
-;  LDA $2002             ; read PPU status to reset the high/low latch
-;  LDA #$20
-;  STA $2006             ; write the high byte of $2000 address
-;  LDA #$00
-;  STA $2006             ; write the low byte of $2000 address
-;  LDY #$00              ; start out at 0
-;LoadBGOuterLoop:
-;  LDX #$00              ; start out at 0
-;LoadBGInnerLoop:
-;  LDA clear_tile, x     ; load data from address (clear_tile + the value in x)
-;  STA $2007             ; write to PPU
-;  INX                   ; X = X + 1
-;  CPX #$80              ; Compare X to hex $80, decimal 128 - copying 128 bytes
-;  BNE LoadBGInnerLoop   ; Branch to LoadBackgroundLoop if compare was Not Equal to zero
-;                        ; if compare was equal to 128, keep going down
-;  INY 					 
-;  CPY #$08               
-;  BNE LoadBGOuterLoop   
-;  LDX #$00
-;LoadBGLoop:
-;  LDA background, x
-;  STA $2007
-;  INX
-;  CPX #$80
-;  BNE LoadBGLoop
+		
   
 LoadPongAttribute:
   LDA $2002             ; read PPU status to reset the high/low latch
@@ -150,7 +123,7 @@ LoadPongAttribute:
   LDX #$00              ; start out at 0
 
 LoadPongAttributeLoop:
-   LDA pongAttribute, x      ; load data from address (attribute + the value in x)
+   LDA bg_attributes, x      ; load data from address (attribute + the value in x)
    STA $2007             ; write to PPU
    INX                   ; X = X + 1
    CPX #$40              ; Compare X to hex $40 - decimal 16 x 4
@@ -401,11 +374,11 @@ UpdateSprites:
   RTS
  
 DrawSprite:
-  ; Push registers we're going to mess with 
-  PHP ; Push Processor Status
-  PHA ; Push Accumulator
-  TXA ; Transfer Accumulator to X
-  PHA ; Push Accumulator (X)
+	; Push registers we're going to mess with 
+	PHP ; Push Processor Status
+	PHA ; Push Accumulator
+	TXA ; Transfer Accumulator to X
+	PHA ; Push Accumulator (X)
 
 	LDX sprite_offset
 	; Y Pos
@@ -426,11 +399,11 @@ DrawSprite:
 	INX
 	STX sprite_offset
 
-  ; Restore registers
-  PLA ; Pull Accumulator (X)
-  TAX ; Transfer Accumulator to X
-  PLA ; Pull Accumulator 
-  PLP ; Pull Processor Statu
+	; Restore registers
+	PLA ; Pull Accumulator (X)
+	TAX ; Transfer Accumulator to X
+	PLA ; Pull Accumulator 
+	PLP ; Pull Processor Statu
 	RTS
  
 ClearSprites:
@@ -476,52 +449,21 @@ ClearSpritesLoop:
   
   .bank 1
   .org $E000
-  ;these need to be stored in the right order, apparently. tile_attribute was before the name table and it 
-  ;was offsetting everything by a 8 bytes. oops.
+
   
-background:
+bg_nametable:
   .incbin "pong_nam.nam"
   
-pongAttribute: ;manually copied from pong.nam export
-  ;.db $00,$00,$00,$00,$00,$00,$00,$00,$CA,$3A,$0A,$0A,$0A,$0A,$CA,$3A
-  ;.db $CC,$33,$00,$00,$00,$00,$CC,$33,$CC,$33,$00,$00,$00,$00,$CC,$33 
-  ;.db $CC,$33,$00,$00,$00,$00,$CC,$33,$CC,$33,$00,$00,$00,$00,$CC,$33
-  ;.db $CC,$33,$00,$00,$00,$00,$CC,$33,$0A,$0A,$0A,$0A,$0A,$0A,$0A,$0A
+bg_attributes: 
   .incbin "pong_atr.atr"
   
 palette:
-  .incbin "pong.pal"
-  ;.db COLOR_BLACK,$01,$21,$31,  $22,$36,$17,$0F,  $22,$30,$21,$0F,  $22,$27,$17,$0F   ;;background palette
-  .db COLOR_BLACK,$01,$21,$31,  $22,$02,$38,$3C,  $22,$1C,$15,$14,  $22,$02,$38,$3C   ;;sprite palette
-  ;.incbin "pong.pal"
+  .incbin "pong.pal"  ;background palette
+  .db COLOR_BLACK,$01,$21,$31,  $22,$02,$38,$3C,  $22,$1C,$15,$14,  $22,$02,$38,$3C   ;sprite palette
+
   
-;tile_attribute: ;  Each byte covers 4x4 tiles
-  ;.db %00000000, %00000000, %00000000, %00000000, %00000000, %00000000, %00000000, %00000000
-     
-;clear_tile:  ; 32 x 4 tiles = 128 bytes
-;  .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 1
-;  .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 2
-;  .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 3
-;  .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 4
-  
-;wall_tile:  ; 32 x 4 tiles 
-;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 1
-;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 2
-;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 3
-;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 4  
-;
-;ceiling_tile:  ; 32 x 4 tiles 
-;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 1
-;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 2
-;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 3
-;  .db $82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82  ;;row 4  
-;  
-;floor_tile:  ; 32 x 4 tiles 
-;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 1
-;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 2
-;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 3
-;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 4    
-;
+
+;;;;;;;;;;;;;;  
   .org $FFFA     ;first of the three vectors starts here
   .dw NMI        ;when an NMI happens (once per frame if enabled) the 
                    ;processor will jump to the label NMI:
