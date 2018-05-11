@@ -4,17 +4,21 @@
 
 LoadGameplay:
 
-	; Turn off screen
-    LDA #$00 
-    STA PPU_CTRL
-    STA PPU_MASK
+	; Turn screen off
+	LDA #$00
+	STA $2000
+	LDA #$00  
+	STA $2001
 
 	; Clear old sprite data
 	JSR ClearSprites
   
-	; Load background	
+	; Load Background Tiles
   
-	; Load palettes
+	; Load Background Attributes
+	
+	; Load Palettes
+	
   
 	; Initialize gameplay variables
 	LDA #100
@@ -25,19 +29,19 @@ LoadGameplay:
 	STA score1
 	STA score2
   
-	; Assume player 2 is cpu for now
-  	LDA #TRUE
+	; Assume player 2 is person for now
+  	LDA #FALSE
   	STA player2_is_cpu
 
   	; Init ball motion
   	JSR GameplayInitBall
 
 	; Turn on screen
-  
 	LDA #%10011000   ; enable NMI, sprites from Pattern Table 1, background from Pattern Table 1
 	STA $2000
 	LDA #%00011110   ; enable sprites, enable background, no clipping on left side
 	STA $2001
+
   
 	; Set the new state
 	LDA #STATEPLAYING 
