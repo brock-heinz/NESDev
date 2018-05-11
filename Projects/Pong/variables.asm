@@ -1,4 +1,6 @@
 ; Pong Variables
+pointerLo  .rs 1
+pointerHi  .rs 1
 
 watch      .rs 1  ; .rs 1 means reserve one byte of space
 gamestate  .rs 1  ; current application state
@@ -17,7 +19,7 @@ buttons2   .rs 1  ; player 2 gamepad buttons, one bit per button
 score1     .rs 1  ; player 1 score
 score2     .rs 1  ; player 2 score
 
-player2_is_cpu	.rs 1  ; player 2 score
+player2_is_cpu	.rs 1  ; player 2 status
 
 sprite_offset 	.rs 1 ; sprite write address
 sprite_xpos		.rs 1 ; sprite X position

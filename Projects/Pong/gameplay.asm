@@ -42,6 +42,7 @@ LoadGameplay:
 	; Set the new state
 	LDA #STATEPLAYING 
 	STA gamestate
+	
 LoadGameplayDone:	
 	RTS
 
@@ -87,6 +88,8 @@ GameplayMovePaddles:
 	LDA paddle1ytop
 	CLC
 	ADC #PADDLE_SPEED
+	;CMP PADDLE_LIM_BTM
+	;BCS SkipP1MoveDown
 	STA paddle1ytop
 SkipP1MoveDown:
 
@@ -95,7 +98,9 @@ SkipP1MoveDown:
 	BEQ SkipP1MoveUp
 	LDA paddle1ytop
 	SEC
-	SBC #PADDLE_SPEED  
+	SBC #PADDLE_SPEED
+	;CMP PADDLE_LIM_TOP
+	;BCC SkipP1MoveUp	
 	STA paddle1ytop
 SkipP1MoveUp:
 
@@ -300,7 +305,7 @@ GameplayDrawSprites:
 	
 	; Draw Player 1 
 	
-	; Use the square block for the paddles
+	; Draw paddle logic
 	JSR StorePaddleSpriteTop
 	
 	LDA #PADDLE1X
@@ -354,7 +359,7 @@ Player2DrawStage3:
 	BNE DrawPlayer2Loop
 	
 	; Draw Score for Player 1
-	LDA #$10
+	LDA #$18
 	STA sprite_ypos
 	LDA #$20
 	STA sprite_xpos
@@ -370,7 +375,7 @@ Player2DrawStage3:
 	
 
 	; Draw Score for Player 2
-	LDA #$10
+	LDA #$18
 	STA sprite_ypos
 	LDA #$D0
 	STA sprite_xpos
@@ -383,6 +388,9 @@ Player2DrawStage3:
 	STA sprite_attr
 
 	JSR DrawSprite
+	
+	;JMP GameplayDrawSpritesDone
+	
 	
 StorePaddleSpriteTop:
 	LDA #$01
@@ -399,7 +407,7 @@ StorePaddleSpriteMid:
 StorePaddleSpriteBottom:
 	LDA #$01 
 	STA sprite_tile
-	LDA #%10100000
+	LDA #%11000000
 	STA sprite_attr
 	RTS
 	
