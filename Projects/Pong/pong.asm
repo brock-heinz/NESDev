@@ -14,6 +14,18 @@
   .include "constants.asm"
   .include "nes_constants.asm"
 
+  ; Famitone2 Config
+FT_BASE_ADR		= $0300	;page in the RAM used for FT2 variables, should be $xx00
+FT_TEMP			= $00	;3 bytes in zeropage used by the library as a scratchpad
+FT_DPCM_OFF		= $c000	;$c000..$ffc0, 64-byte steps
+FT_SFX_STREAMS	= 4		;number of sound effects played at once, 1..4
+
+; FT_DPCM_ENABLE			;undefine to exclude all DMC code
+; FT_SFX_ENABLE			;undefine to exclude all sound effects code
+; FT_THREAD				;undefine if you are calling sound effects from the same thread as the sound update call
+
+FT_PAL_SUPPORT			;undefine to exclude PAL support
+FT_NTSC_SUPPORT			;undefine to exclude NTSC support
   
   
 ;;;;;;;;;;;;;;;;;;
@@ -146,8 +158,17 @@ LoadPongAttributeLoop:
   LDA #$02
   STA ballspeedx
   STA ballspeedy
-
-
+  
+  ;; Init FamiTone2
+  LDA #$80			; Force NTSC for FamiTone for now, need to detect this!
+  STA ft_ntsc_mode	;$00 PAL, $80 NTSC
+  LDX #LOW(after_the_rain_music_data)
+  LDY #HIGH(after_the_rain_music_data)
+  LDA ft_ntsc_mode
+  JSR FamiToneInit		;init FamiTone
+  LDA #0
+  JSR FamiToneMusicPlay
+	
 ;;:Set starting game state
   LDA #STATELOADTITLE
   STA gamestate
@@ -175,7 +196,6 @@ NMI:
   STA $4014       ; set the high byte (02) of the RAM address, start the transfer
 
   ;;This is the PPU clean up section, so rendering the next frame starts properly.
-  ;LDA #%10010000   ; enable NMI, sprites from Pattern Table 0, background from Pattern Table 1
   LDA #%10011000   ; enable NMI, sprites from Pattern Table 1, background from Pattern Table 1
   STA $2000
   LDA #%00011110   ; enable sprites, enable background, no clipping on left side
@@ -184,6 +204,9 @@ NMI:
   STA $2005
   STA $2005
     
+  ; FamiTone Update
+  jsr FamiToneUpdate		;update sound
+	
   ;;;all graphics updates done by here, run game engine
 
 
@@ -445,6 +468,14 @@ ClearSpritesLoop:
   .include "controllers.asm"
   .include "gameplay.asm"
   
+; FamiTone2 Library
+  .include "famitone2.asm"
+  
+  ;
+  	;.include "ft_danger_streets.asm"
+	; .include "ft_after_the_rain.asm"
+	;.include "ft_sounds.asm"
+	
 ;;;;;;;;;;;;;;  
   
   .bank 1
@@ -461,6 +492,8 @@ palette:
   .incbin "pong.pal"  ;background palette
   .db COLOR_BLACK,$01,$21,$31,  $22,$02,$38,$3C,  $22,$1C,$15,$14,  $22,$02,$38,$3C   ;sprite palette
 
+ft_after_the_rain: 
+  .include "ft_after_the_rain.asm"
   
 
 ;;;;;;;;;;;;;;  
