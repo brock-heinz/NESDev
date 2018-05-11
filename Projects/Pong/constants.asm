@@ -14,7 +14,7 @@ BOTTOMWALL     = $D8	; 16 pixels / 2 tiles
 LEFTWALL       = $04
   
 PADDLE_LIM_TOP  = $38
-PADDLE_LIM_BTM  = $D0  
+PADDLE_LIM_BTM  = $B0  
   
 PADDLE1X		= $0C ; horizontal position for paddles, doesnt move
 PADDLE1XR		= $1C ; Right side of player 1 paddle (for collision tests)

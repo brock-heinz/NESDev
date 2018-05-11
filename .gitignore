@@ -1,7 +1,9 @@
 # Skip these files made by NES tools  #
 #######################################
 *.sav
-
+*.cfg
+*.nes
+*.fns
 
 # Compiled source #
 ###################
