@@ -1,6 +1,8 @@
 ; Pong Variables
-pointerLo  .rs 1
-pointerHi  .rs 1
+
+ft_scratchpad .rs 3 ; reserve 3 bytes at $00 for famitone2 scratch pad (todo: move address)
+
+ft_ntsc_mode .rs 1
 
 watch      .rs 1  ; .rs 1 means reserve one byte of space
 gamestate  .rs 1  ; current application state
@@ -27,5 +29,7 @@ sprite_ypos		.rs 1 ; sprite Y position
 sprite_attr		.rs 1 ; sprite attributes
 sprite_tile		.rs 1 ; sprite tile address
 
+pointerLo  .rs 1
+pointerHi  .rs 1
 
 random_seed: .rs 2       ; initialize 16-bit seed to any value except 0
