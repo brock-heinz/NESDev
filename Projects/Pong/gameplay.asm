@@ -42,6 +42,7 @@ LoadGameplay:
 	; Set the new state
 	LDA #STATEPLAYING 
 	STA gamestate
+	
 LoadGameplayDone:	
 	RTS
 
@@ -87,6 +88,8 @@ GameplayMovePaddles:
 	LDA paddle1ytop
 	CLC
 	ADC #PADDLE_SPEED
+	;CMP PADDLE_LIM_BTM
+	;BCS SkipP1MoveDown
 	STA paddle1ytop
 SkipP1MoveDown:
 
@@ -95,7 +98,9 @@ SkipP1MoveDown:
 	BEQ SkipP1MoveUp
 	LDA paddle1ytop
 	SEC
-	SBC #PADDLE_SPEED  
+	SBC #PADDLE_SPEED
+	;CMP PADDLE_LIM_TOP
+	;BCC SkipP1MoveUp	
 	STA paddle1ytop
 SkipP1MoveUp:
 
@@ -300,39 +305,61 @@ GameplayDrawSprites:
 	
 	; Draw Player 1 
 	
-	; Use the square block for the paddles
-	LDA #$84 
-	STA sprite_tile	
-
+	; Draw paddle logic
+	JSR StorePaddleSpriteTop
+	
 	LDA #PADDLE1X
 	STA sprite_xpos
 	LDA paddle1ytop	
 	LDX #PADDLE_SPRITES
+	
 DrawPlayer1Loop:
 	STA sprite_ypos
+	PHA
+	CPX #$04
+	BNE Player1DrawStage2 
+	JSR StorePaddleSpriteMid
+Player1DrawStage2:
+	CPX #$01
+	BNE Player1DrawStage3
+	JSR StorePaddleSpriteBottom
+Player1DrawStage3:
 	JSR DrawSprite
+	PLA
 	CLC
 	ADC #$08
 	DEX
 	BNE DrawPlayer1Loop
-
-
+	
+	
 	
 	; Draw Player 2
+	JSR StorePaddleSpriteTop
+	
 	LDA #PADDLE2X
 	STA sprite_xpos
-	LDA paddle2ytop	
+	LDA paddle2ytop
 	LDX #PADDLE_SPRITES
 DrawPlayer2Loop:
 	STA sprite_ypos
+	PHA
+	CPX #$04
+	BNE Player2DrawStage2 
+	JSR StorePaddleSpriteMid
+Player2DrawStage2:
+	CPX #$01
+	BNE Player2DrawStage3
+	JSR StorePaddleSpriteBottom
+Player2DrawStage3:
 	JSR DrawSprite
+	PLA
 	CLC
 	ADC #$08
 	DEX
 	BNE DrawPlayer2Loop
 	
 	; Draw Score for Player 1
-	LDA #$10
+	LDA #$18
 	STA sprite_ypos
 	LDA #$20
 	STA sprite_xpos
@@ -348,7 +375,7 @@ DrawPlayer2Loop:
 	
 
 	; Draw Score for Player 2
-	LDA #$10
+	LDA #$18
 	STA sprite_ypos
 	LDA #$D0
 	STA sprite_xpos
@@ -362,7 +389,28 @@ DrawPlayer2Loop:
 
 	JSR DrawSprite
 	
-
+	;JMP GameplayDrawSpritesDone
+	
+	
+StorePaddleSpriteTop:
+	LDA #$01
+	STA sprite_tile
+	LDA #$00
+	STA sprite_attr
+	RTS 
+	
+StorePaddleSpriteMid:
+	LDA #$02 
+	STA sprite_tile	
+	RTS
+	
+StorePaddleSpriteBottom:
+	LDA #$01 
+	STA sprite_tile
+	LDA #%11000000
+	STA sprite_attr
+	RTS
+	
 GameplayDrawSpritesDone:
 	RTS
 

@@ -58,6 +58,39 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
   BPL vblankwait2
 
 
+              
+LoadBackground:
+  LDA $2002             ; read PPU status to reset the high/low latch
+  LDA #$20
+  STA $2006             ; write the high byte of $2000 address
+  LDA #$00
+  STA $2006             ; write the low byte of $2000 address
+
+  LDA #$00
+  STA pointerLo       ; put the low byte of the address of background into pointer
+  LDA #HIGH(background)
+  STA pointerHi       ; put the high byte of the address into pointer
+  
+  LDX #$00            ; start at pointer + 0
+  LDY #$00
+
+BGoutsideLoop:
+    
+BGinsideLoop:
+  LDA [pointerLo], y  ; copy one background byte from address in pointer plus Y
+  STA $2007           ; this runs 256 * 4 times
+  
+  INY                 ; inside loop counter
+  CPY #$00
+  BNE BGinsideLoop      ; run the inside loop 256 times before continuing down
+  
+  INC pointerHi       ; low byte went 0 to 256, so high byte needs to be changed now
+  
+  INX
+  CPX #$04
+  BNE BGoutsideLoop     ; run the outside loop 256 times before continuing down
+
+
 LoadPalettes:
   LDA $2002             ; read PPU status to reset the high/low latch
   LDA #$3F
@@ -77,27 +110,51 @@ LoadPalettesLoop:
   BNE LoadPalettesLoop  ; Branch to LoadPalettesLoop if compare was Not Equal to zero
                         ; if compare was equal to 32, keep going down
 
-LoadBG:
-  LDA $2002             ; read PPU status to reset the high/low latch
-  LDA #$20
-  STA $2006             ; write the high byte of $2000 address
-  LDA #$00
-  STA $2006             ; write the low byte of $2000 address
-  LDY #$00              ; start out at 0
-LoadBGOuterLoop:
-  LDX #$00              ; start out at 0
-LoadBGInnerLoop:
-  LDA clear_tile, x     ; load data from address (clear_tile + the value in x)
-  STA $2007             ; write to PPU
-  INX                   ; X = X + 1
-  CPX #$80              ; Compare X to hex $80, decimal 128 - copying 128 bytes
-  BNE LoadBGInnerLoop   ; Branch to LoadBackgroundLoop if compare was Not Equal to zero
-                        ; if compare was equal to 128, keep going down
-  INY 					 
-  CPY #$08               
-  BNE LoadBGOuterLoop   
-  
+											
+						
+						
 
+;LoadBG:
+;  LDA $2002             ; read PPU status to reset the high/low latch
+;  LDA #$20
+;  STA $2006             ; write the high byte of $2000 address
+;  LDA #$00
+;  STA $2006             ; write the low byte of $2000 address
+;  LDY #$00              ; start out at 0
+;LoadBGOuterLoop:
+;  LDX #$00              ; start out at 0
+;LoadBGInnerLoop:
+;  LDA clear_tile, x     ; load data from address (clear_tile + the value in x)
+;  STA $2007             ; write to PPU
+;  INX                   ; X = X + 1
+;  CPX #$80              ; Compare X to hex $80, decimal 128 - copying 128 bytes
+;  BNE LoadBGInnerLoop   ; Branch to LoadBackgroundLoop if compare was Not Equal to zero
+;                        ; if compare was equal to 128, keep going down
+;  INY 					 
+;  CPY #$08               
+;  BNE LoadBGOuterLoop   
+;  LDX #$00
+;LoadBGLoop:
+;  LDA background, x
+;  STA $2007
+;  INX
+;  CPX #$80
+;  BNE LoadBGLoop
+  
+LoadPongAttribute:
+  LDA $2002             ; read PPU status to reset the high/low latch
+  LDA #$23
+  STA $2006             ; write the high byte of $23C0 address
+  LDA #$C0
+  STA $2006             ; write the low byte of $23C0 address
+  LDX #$00              ; start out at 0
+
+LoadPongAttributeLoop:
+   LDA pongAttribute, x      ; load data from address (attribute + the value in x)
+   STA $2007             ; write to PPU
+   INX                   ; X = X + 1
+   CPX #$40              ; Compare X to hex $40 - decimal 16 x 4
+   BNE LoadPongAttributeLoop
 
 ;;;Set some initial ball stats
   LDA #$01
@@ -407,6 +464,8 @@ ClearSpritesLoop:
 ;  TAX ; Transfer Accumulator to X
 ;  RTS
 
+; RLE compression for use with NES Screen Tool
+; .include "rle.asm"
   
 ;; Game State Logic
   .include "title_screen.asm"
@@ -415,41 +474,54 @@ ClearSpritesLoop:
   
 ;;;;;;;;;;;;;;  
   
-  
-  
   .bank 1
   .org $E000
+  ;these need to be stored in the right order, apparently. tile_attribute was before the name table and it 
+  ;was offsetting everything by a 8 bytes. oops.
+  
+background:
+  .incbin "pong_nam.nam"
+  
+pongAttribute: ;manually copied from pong.nam export
+  ;.db $00,$00,$00,$00,$00,$00,$00,$00,$CA,$3A,$0A,$0A,$0A,$0A,$CA,$3A
+  ;.db $CC,$33,$00,$00,$00,$00,$CC,$33,$CC,$33,$00,$00,$00,$00,$CC,$33 
+  ;.db $CC,$33,$00,$00,$00,$00,$CC,$33,$CC,$33,$00,$00,$00,$00,$CC,$33
+  ;.db $CC,$33,$00,$00,$00,$00,$CC,$33,$0A,$0A,$0A,$0A,$0A,$0A,$0A,$0A
+  .incbin "pong_atr.atr"
+  
 palette:
-  .db COLOR_BLACK,$01,$21,$31,  $22,$36,$17,$0F,  $22,$30,$21,$0F,  $22,$27,$17,$0F   ;;background palette
+  .incbin "pong.pal"
+  ;.db COLOR_BLACK,$01,$21,$31,  $22,$36,$17,$0F,  $22,$30,$21,$0F,  $22,$27,$17,$0F   ;;background palette
   .db COLOR_BLACK,$01,$21,$31,  $22,$02,$38,$3C,  $22,$1C,$15,$14,  $22,$02,$38,$3C   ;;sprite palette
-
-tile_attribute: ;  Each byte covers 4x4 tiles
-  .db %00000000, %00000000, %00000000, %00000000, %00000000, %00000000, %00000000, %00000000
+  ;.incbin "pong.pal"
   
-clear_tile:  ; 32 x 4 tiles = 128 bytes
-  .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 1
-  .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 2
-  .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 3
-  .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 4
+;tile_attribute: ;  Each byte covers 4x4 tiles
+  ;.db %00000000, %00000000, %00000000, %00000000, %00000000, %00000000, %00000000, %00000000
+     
+;clear_tile:  ; 32 x 4 tiles = 128 bytes
+;  .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 1
+;  .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 2
+;  .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 3
+;  .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00  ;;row 4
   
-wall_tile:  ; 32 x 4 tiles 
-  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 1
-  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 2
-  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 3
-  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 4  
-
-ceiling_tile:  ; 32 x 4 tiles 
-  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 1
-  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 2
-  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 3
-  .db $21,$82,$21,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$21,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82  ;;row 4  
-  
-floor_tile:  ; 32 x 4 tiles 
-  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 1
-  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 2
-  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 3
-  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 4    
-
+;wall_tile:  ; 32 x 4 tiles 
+;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 1
+;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 2
+;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 3
+;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 4  
+;
+;ceiling_tile:  ; 32 x 4 tiles 
+;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 1
+;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 2
+;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 3
+;  .db $82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82,$82  ;;row 4  
+;  
+;floor_tile:  ; 32 x 4 tiles 
+;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 1
+;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 2
+;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 3
+;  .db $82,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$82  ;;row 4    
+;
   .org $FFFA     ;first of the three vectors starts here
   .dw NMI        ;when an NMI happens (once per frame if enabled) the 
                    ;processor will jump to the label NMI:
@@ -463,4 +535,4 @@ floor_tile:  ; 32 x 4 tiles
   
   .bank 2
   .org $0000
-  .incbin "sprites.chr"   ;includes 8KB graphics file from sprites.chr
+  .incbin "pong.chr"   ;includes 8KB graphics file from pong.chr

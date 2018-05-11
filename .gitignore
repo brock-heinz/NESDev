@@ -1,3 +1,8 @@
+# Skip these files made by NES tools  #
+#######################################
+*.sav
+
+
 # Compiled source #
 ###################
 *.o
