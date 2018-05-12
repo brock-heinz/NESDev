@@ -162,8 +162,8 @@ LoadPongAttributeLoop:
   ;; Init FamiTone2
   LDA #$80			; Force NTSC for FamiTone for now, need to detect this!
   STA ft_ntsc_mode	;$00 PAL, $80 NTSC
-  LDX #LOW(after_the_rain_music_data)
-  LDY #HIGH(after_the_rain_music_data)
+  LDX #LOW(pong_music_data)
+  LDY #HIGH(pong_music_data)
   LDA ft_ntsc_mode
   JSR FamiToneInit		;init FamiTone
   LDA #0
@@ -492,8 +492,8 @@ palette:
   .incbin "pong.pal"  ;background palette
   .db COLOR_BLACK,$01,$21,$31,  $22,$02,$38,$3C,  $22,$1C,$15,$14,  $22,$02,$38,$3C   ;sprite palette
 
-ft_after_the_rain: 
-  .include "ft_after_the_rain.asm"
+ft_pong: 
+  .include "ft_pong.asm"
   
 
 ;;;;;;;;;;;;;;  
