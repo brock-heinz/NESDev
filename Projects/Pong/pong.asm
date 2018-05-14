@@ -59,37 +59,46 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
 
 
               
-LoadBackground:
+;LoadBackground:
+;  LDA $2002             ; read PPU status to reset the high/low latch
+;  LDA #$20
+;  STA $2006             ; write the high byte of $2000 address
+;  LDA #$00
+;  STA $2006             ; write the low byte of $2000 address
+;
+;  LDA #LOW(bg_nametable)
+;  STA pointerLo       ; put the low byte of the address of background into pointer
+;  LDA #HIGH(bg_nametable)
+;  STA pointerHi       ; put the high byte of the address into pointer
+;  
+;  LDX #$00            ; start at pointer + 0
+;  LDY #$00
+;
+;BGoutsideLoop:
+;    
+;BGinsideLoop:
+;  LDA [pointerLo], y  ; copy one background byte from address in pointer plus Y
+;  STA $2007           ; this runs 256 * 4 times
+;  
+;  INY                 ; inside loop counter
+;  CPY #$00
+;  BNE BGinsideLoop      ; run the inside loop 256 times before continuing down
+;  
+;  INC pointerHi       ; low byte went 0 to 256, so high byte needs to be changed now
+;  
+;  INX
+;  CPX #$04
+;  BNE BGoutsideLoop     ; run the outside loop 256 times before continuing down
+
+   ;;; Let's try the RLE background! 
   LDA $2002             ; read PPU status to reset the high/low latch
   LDA #$20
   STA $2006             ; write the high byte of $2000 address
   LDA #$00
   STA $2006             ; write the low byte of $2000 address
-
-  LDA #LOW(bg_nametable)
-  STA pointerLo       ; put the low byte of the address of background into pointer
-  LDA #HIGH(bg_nametable)
-  STA pointerHi       ; put the high byte of the address into pointer
-  
-  LDX #$00            ; start at pointer + 0
-  LDY #$00
-
-BGoutsideLoop:
-    
-BGinsideLoop:
-  LDA [pointerLo], y  ; copy one background byte from address in pointer plus Y
-  STA $2007           ; this runs 256 * 4 times
-  
-  INY                 ; inside loop counter
-  CPY #$00
-  BNE BGinsideLoop      ; run the inside loop 256 times before continuing down
-  
-  INC pointerHi       ; low byte went 0 to 256, so high byte needs to be changed now
-  
-  INX
-  CPX #$04
-  BNE BGoutsideLoop     ; run the outside loop 256 times before continuing down
-
+  LDX #LOW(bg_nametable_rle)
+  LDY #HIGH(bg_nametable_rle)
+  JSR unrle 
 
 LoadPalettes:
   LDA $2002             ; read PPU status to reset the high/low latch
@@ -129,10 +138,7 @@ LoadPongAttributeLoop:
    CPX #$40              ; Compare X to hex $40 - decimal 16 x 4
    BNE LoadPongAttributeLoop
 
-   ;;; Let's try the RLE background! 
-;  LDX #LOW(bg_nametable_rle)
-;  LDY #HIGH(bg_nametable_rle)
-;  JSR unrle 
+
    
    
 ;;;Set some initial ball stats
@@ -486,11 +492,11 @@ FT_NTSC_SUPPORT			;undefine to exclude NTSC support
   .org $E000
 
   
-bg_nametable:
-  .incbin "pong_nam.nam"
+;bg_nametable:
+;  .incbin "pong_nam.nam"
 
-;bg_nametable_rle:
-;  .incbin "pong_nam.rle"
+bg_nametable_rle:
+  .incbin "pong_nam.rle"
   
 bg_attributes: 
   .incbin "pong_atr.atr"
