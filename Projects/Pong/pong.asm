@@ -1,3 +1,5 @@
+;;;;;;;;;;;;;;;
+;; ROM Header
   .inesprg 1   ; 1x 16KB PRG code
   .ineschr 1   ; 1x  8KB CHR data
   .inesmap 0   ; mapper 0 = NROM, no bank swapping
@@ -19,10 +21,6 @@
   
   
 ;;;;;;;;;;;;;;;;;;
-
-
-
-
   .bank 0
   .org $C000 
 RESET:
@@ -68,7 +66,7 @@ LoadBackground:
   LDA #$00
   STA $2006             ; write the low byte of $2000 address
 
-  LDA #$00
+  LDA #LOW(bg_nametable)
   STA pointerLo       ; put the low byte of the address of background into pointer
   LDA #HIGH(bg_nametable)
   STA pointerHi       ; put the high byte of the address into pointer
@@ -108,7 +106,7 @@ LoadPalettesLoop:
                         ; etc
   STA $2007             ; write to PPU
   INX                   ; X = X + 1
-  CPX #$20              ; Compare X to hex $10, decimal 16 - copying 16 bytes = 4 sprites
+  CPX #$20              ; Compare X to hex $20, decimal 32 - copying 32 bytes = 8 palettesS
   BNE LoadPalettesLoop  ; Branch to LoadPalettesLoop if compare was Not Equal to zero
                         ; if compare was equal to 32, keep going down
 
@@ -131,6 +129,12 @@ LoadPongAttributeLoop:
    CPX #$40              ; Compare X to hex $40 - decimal 16 x 4
    BNE LoadPongAttributeLoop
 
+   ;;; Let's try the RLE background! 
+;  LDX #LOW(bg_nametable_rle)
+;  LDY #HIGH(bg_nametable_rle)
+;  JSR unrle 
+   
+   
 ;;;Set some initial ball stats
   LDA #$01
   STA balldown
@@ -195,7 +199,7 @@ NMI:
   STA $2005
     
   ; FamiTone Update
-  jsr FamiToneUpdate		;update sound
+  JSR FamiToneUpdate		;update sound
 	
   ;;;all graphics updates done by here, run game engine
 
@@ -450,14 +454,15 @@ ClearSpritesLoop:
 ;  TAX ; Transfer Accumulator to X
 ;  RTS
 
-; RLE compression for use with NES Screen Tool
-; .include "rle.asm"
+
   
 ;; Game State Logic
   .include "title_screen.asm"
   .include "controllers.asm"
   .include "gameplay.asm"
   
+  ; RLE compression for use with NES Screen Tool
+  .include "rle.asm"
 
   ; Famitone2 Config
 FT_BASE_ADR		= $0300	;page in the RAM used for FT2 variables, should be $xx00
@@ -483,6 +488,9 @@ FT_NTSC_SUPPORT			;undefine to exclude NTSC support
   
 bg_nametable:
   .incbin "pong_nam.nam"
+
+;bg_nametable_rle:
+;  .incbin "pong_nam.rle"
   
 bg_attributes: 
   .incbin "pong_atr.atr"
