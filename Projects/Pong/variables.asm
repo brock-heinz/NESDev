@@ -1,5 +1,7 @@
 ; Pong Variables
 
+rle_scratchpad .rs 4 ; RLE scratchpad (todo: rewrite RLE  to use named variables
+
 ft_scratchpad .rs 3 ; reserve 3 bytes at $00 for famitone2 scratch pad (todo: move address)
 
 ft_ntsc_mode .rs 1
