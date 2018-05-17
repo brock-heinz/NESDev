@@ -28,7 +28,6 @@ LoadGameplay:
  
 	; Load Palettes
 	JSR LoadPalettes									
- 
   
 	; Initialize gameplay variables
 	LDA #100
@@ -56,6 +55,11 @@ LoadGameplay:
 	; Set the new state
 	LDA #STATEPLAYING 
 	STA gamestate
+	
+	; initialize things to zero
+	LDA #$00
+	STA animCounter
+	STA ballspeedy_plus	
 	
 LoadGameplayDone:	
 	RTS
@@ -88,6 +92,7 @@ TickGameplay:
   JSR GameplayMoveBall
   JSR GameplayCollideBall
   JSR GameplayDrawSprites
+  JSR UpdateAnimation
 TickGameplayDone:
   RTS
 
@@ -179,10 +184,27 @@ GameplayMoveBallRight:
 	
 	
 	; The ball has collided with the paddle, so bounce it!
+	SBC bally
+	CLC
+	CMP #$01
+	BCS set_plus
+	CLC
+	CMP #$04 
+	BCS set_plus
+	LDA #$00
+	STA ballspeedy_plus
+	JMP check_ends_done_left
+	
+set_plus:
+	LDA #$02
+	STA ballspeedy_plus
+	
+check_ends_done:	
 	LDA #$01
 	STA ballleft
 	LDA #$00
 	STA ballright
+	
 Player2NoBallCollision:
 	
 	LDA ballx
@@ -270,6 +292,7 @@ GameplayMoveBallDown:
   LDA bally
   CLC
   ADC ballspeedy        ;;bally position = bally + ballspeedy
+  ADC ballspeedy_plus
   STA bally
 
   LDA bally
@@ -385,8 +408,7 @@ Player2DrawStage3:
 	LDA #$00
 	STA sprite_attr
 
-	JSR DrawSprite
-	
+	JSR DrawSprite	
 
 	; Draw Score for Player 2
 	LDA #$18
@@ -403,7 +425,53 @@ Player2DrawStage3:
 
 	JSR DrawSprite
 	
-	;JMP GameplayDrawSpritesDone
+	
+roundTimerDrawDone:
+	
+	; Draw gears
+	LDA buttons1
+	AND #DPAD_DOWN ;is player pressing down?
+	BEQ GearCheckP1A ;;no
+	
+	AnimateGearP1:
+	CLC
+	LDA animCounter
+	CMP #$0A ;over 10?
+	BCC DrawGearsP1_Frame2
+	JMP DrawGearsP1
+	DrawGearsP1_Frame2:
+	JMP DrawGearsP1_2
+	
+	GearCheckP1A:
+	LDA buttons1
+	AND #DPAD_UP
+	BEQ DrawGearsP1_Frame2 ;;no
+	JMP AnimateGearP1
+	
+	DrawGearsP1Done:
+	
+	LDA buttons2
+	AND #DPAD_DOWN ;is player pressing down?
+	BEQ GearCheckP2A ;no
+	
+	AnimateGearP2:
+	CLC
+	LDA animCounter
+	CMP #$0A ;over 10?
+	BCC DrawGearsP2_Frame2
+	JMP DrawGearsP2
+	DrawGearsP2_Frame2:
+	JMP DrawGearsP2_2
+	
+	GearCheckP2A:
+	LDA buttons2
+	AND #DPAD_UP
+	BEQ DrawGearsP2_Frame2
+	JMP AnimateGearP2
+	
+	DrawGearsP2Done:
+	
+	JMP GameplayDrawSpritesDone
 	
 	
 StorePaddleSpriteTop:
@@ -428,5 +496,256 @@ StorePaddleSpriteBottom:
 GameplayDrawSpritesDone:
 	RTS
 
+	
+UpdateAnimation:
+	INC animCounter
+	CLC
+	LDA animCounter
+	CMP #$14 ;10 cycles
+	BCC UpdateAnimCounterDone
+	LDA #$00
+	STA animCounter
+	
+UpdateAnimCounterDone:
+	RTS
 
+DrawGearsP1:
+	;player 1 frame 1
+	;lower
+	LDA #$D8
+	STA sprite_ypos
+	
+	LDA #$08
+	STA sprite_xpos
+
+	LDA #$94
+	STA sprite_tile
+	
+	LDA #$02
+	STA sprite_attr
+	
+	JSR DrawSprite
+	
+	;LDA #$D8
+	;STA sprite_ypos
+
+	LDA #$10
+	STA sprite_xpos
+
+	LDA #$95
+	STA sprite_tile
+	
+	JSR DrawSprite
+
+	;upper
+	LDA #$30
+	STA sprite_ypos
+	
+	LDA #$08
+	STA sprite_xpos
+
+	LDA #$90
+	STA sprite_tile
+	
+	;LDA #$02
+	;STA sprite_attr
+	
+	JSR DrawSprite
+	
+	;LDA #$30
+	;STA sprite_ypos
+
+	LDA #$10
+	STA sprite_xpos
+
+	LDA #$91
+	STA sprite_tile
+	
+	JSR DrawSprite
+
+	JMP DrawGearsP1Done
+
+	
+DrawGearsP1_2: ;player 1 frame 2
+	;lower
+	LDA #$D8
+	STA sprite_ypos
+	
+	LDA #$08
+	STA sprite_xpos
+
+	LDA #$96
+	STA sprite_tile
+	
+	LDA #$02
+	STA sprite_attr
+	
+	JSR DrawSprite
+	
+	LDA #$D8
+	STA sprite_ypos
+
+	LDA #$10
+	STA sprite_xpos
+
+	LDA #$97
+	STA sprite_tile
+	
+	JSR DrawSprite
+	
+	;upper
+	LDA #$30
+	STA sprite_ypos
+	
+	LDA #$08
+	STA sprite_xpos
+
+	LDA #$92
+	STA sprite_tile
+	
+	LDA #$02
+	STA sprite_attr
+	
+	JSR DrawSprite
+	
+	LDA #$30
+	STA sprite_ypos
+
+	LDA #$10
+	STA sprite_xpos
+
+	LDA #$93
+	STA sprite_tile
+	
+	JSR DrawSprite
+
+	JMP DrawGearsP1Done
+
+
+;SkipP1Gears:
+	
+	;do p2 gears here
+;SkipP2Gears:
+	
+	;JMP DrawGearsP1Done
+
+
+DrawGearsP2:
+	;player 2 frame 1
+	;lower 
+	LDA #$D8
+	STA sprite_ypos
+	
+	LDA #$E8
+	STA sprite_xpos
+
+	LDA #$94
+	STA sprite_tile
+	
+	LDA #$02
+	STA sprite_attr
+	
+	JSR DrawSprite
+	
+	;LDA #$D8
+	;STA sprite_ypos
+
+	LDA #$F0
+	STA sprite_xpos
+
+	LDA #$95
+	STA sprite_tile
+	
+	JSR DrawSprite
+
+	;JMP DrawGearsP2Done
+
+	;upper
+	LDA #$30
+	STA sprite_ypos
+	
+	LDA #$E8
+	STA sprite_xpos
+
+	LDA #$90
+	STA sprite_tile
+	
+	;LDA #$02
+	;STA sprite_attr
+	
+	JSR DrawSprite
+	
+	;LDA #$30
+	;STA sprite_ypos
+
+	LDA #$F0
+	STA sprite_xpos
+
+	LDA #$91
+	STA sprite_tile
+	
+	JSR DrawSprite
+
+	JMP DrawGearsP2Done
+	
+DrawGearsP2_2: ;player 2 frame 2
+	
+	;lower
+	LDA #$D8
+	STA sprite_ypos
+	
+	LDA #$E8
+	STA sprite_xpos
+
+	LDA #$96
+	STA sprite_tile
+	
+	LDA #$02
+	STA sprite_attr
+	
+	JSR DrawSprite
+	
+	;LDA #$D8
+	;STA sprite_ypos
+
+	LDA #$F0
+	STA sprite_xpos
+
+	LDA #$97
+	STA sprite_tile
+	
+	JSR DrawSprite
+	
+	;upper
+	LDA #$30
+	STA sprite_ypos
+	
+	LDA #$E8
+	STA sprite_xpos
+
+	LDA #$92
+	STA sprite_tile
+	
+	;LDA #$02
+	;STA sprite_attr
+	
+	JSR DrawSprite
+	
+	;LDA #$30
+	;STA sprite_ypos
+
+	LDA #$F0
+	STA sprite_xpos
+
+	LDA #$93
+	STA sprite_tile
+	
+	JSR DrawSprite
+
+	JMP DrawGearsP2Done
+
+	;do p2 gears here
+;SkipP2Gears:
+	
+	;JMP DrawGearsP2Done
 

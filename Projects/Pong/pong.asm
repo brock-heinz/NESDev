@@ -16,7 +16,6 @@
   .include "constants.asm"
   .include "nes_constants.asm"
 
-	
 
   
   
@@ -100,12 +99,11 @@ vblankwait2:      ; Second wait for vblank, PPU is ready after this
   LDY #HIGH(title_nametable_rle)
   JSR unrle 
 
+
   JSR LoadPalettes
 											
   JSR LoadPongAttribute					
 		
-
-
 
    
    
@@ -174,6 +172,7 @@ NMI:
     
   ; FamiTone Update
   JSR FamiToneUpdate		;update sound
+
 	
   ;;;all graphics updates done by here, run game engine
 
@@ -294,7 +293,7 @@ UpdateSprites:
   .include "title_screen.asm"
   .include "controllers.asm"
   .include "gameplay.asm"
-  
+
   ; RLE compression for use with NES Screen Tool
   .include "rle.asm"
 
@@ -312,14 +311,13 @@ FT_NTSC_SUPPORT			;undefine to exclude NTSC support
   ; FamiTone2 Library
   .include "famitone2.asm"
   
-
 	
 ;;;;;;;;;;;;;;  
   
   .bank 1
   .org $E000
 
-  
+
 ;bg_nametable:
 ;  .incbin "pong_nam.nam"
 
@@ -328,6 +326,7 @@ bg_nametable_rle:
   
 title_nametable_rle:
   .incbin "pong_title.rle"
+
   
 bg_attributes: 
   .incbin "pong_atr.atr"
@@ -335,6 +334,7 @@ bg_attributes:
 palette:
   .incbin "pong.pal"  ;background palette
   .db COLOR_BLACK,$01,$21,$31,  $22,$02,$38,$3C,  $22,$1C,$15,$14,  $22,$02,$38,$3C   ;sprite palette
+
 
 ft_pong: 
   .include "ft_pong.asm"
