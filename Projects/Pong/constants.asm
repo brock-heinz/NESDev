@@ -20,7 +20,7 @@ PADDLE1X		= $0C ; horizontal position for paddles, doesnt move
 PADDLE1XR		= $1C ; Right side of player 1 paddle (for collision tests)
 PADDLE2X		= $EC ;
 PADDLE2XR		= $F4 ; Right side of the player 2 paddle, for collision test
-PADDLE_SPEED	= $02 ; 
+PADDLE_SPEED	= $02 ; pixels per frame
 
 PADDLE_SPRITES	= $05 ; 5 sprites tall
 PADDLE_HEIGHT	= $28 ; 5x8 = 40 pixels

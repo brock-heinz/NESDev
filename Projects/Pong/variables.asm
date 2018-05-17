@@ -1,5 +1,7 @@
 ; Pong Variables
 
+rle_scratchpad .rs 4 ; RLE scratchpad (todo: rewrite RLE  to use named variables
+
 ft_scratchpad .rs 3 ; reserve 3 bytes at $00 for famitone2 scratch pad (todo: move address)
 
 ft_ntsc_mode .rs 1
@@ -35,5 +37,6 @@ pointerHi  .rs 1
 
 animCounter		.rs 1 ; animation counter
 animOffset		.rs 1 ; animation frame offset
+
 
 random_seed: .rs 2       ; initialize 16-bit seed to any value except 0
