@@ -16,6 +16,7 @@ ballleft   .rs 1  ; 1 = ball moving left
 ballright  .rs 1  ; 1 = ball moving right
 ballspeedx .rs 1  ; ball horizontal speed per frame
 ballspeedy .rs 1  ; ball vertical speed per frame
+; ballspeedy_plus .rs 1 
 paddle1ytop		.rs 1  ; player 1 paddle top Y position
 paddle2ytop		.rs 1  ; player 2 paddle top Y position
 buttons1   .rs 1  ; player 1 gamepad buttons, one bit per button
@@ -33,5 +34,9 @@ sprite_tile		.rs 1 ; sprite tile address
 
 pointerLo  .rs 1
 pointerHi  .rs 1
+
+animCounter		.rs 1 ; animation counter
+animOffset		.rs 1 ; animation frame offset
+
 
 random_seed: .rs 2       ; initialize 16-bit seed to any value except 0
