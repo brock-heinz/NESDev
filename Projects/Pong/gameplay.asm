@@ -59,7 +59,7 @@ LoadGameplay:
 	; initialize things to zero
 	LDA #$00
 	STA animCounter
-	STA ballspeedy_plus	
+	;STA ballspeedy_plus	
 	
 LoadGameplayDone:	
 	RTS
@@ -184,22 +184,22 @@ GameplayMoveBallRight:
 	
 	
 	; The ball has collided with the paddle, so bounce it!
-	SBC bally
-	CLC
-	CMP #$01
-	BCS set_plus
-	CLC
-	CMP #$04 
-	BCS set_plus
-	LDA #$00
-	STA ballspeedy_plus
-	JMP check_ends_done_left
+;	SBC bally
+;	CLC
+;	CMP #$01
+;	BCS set_plus
+;	CLC
+;	CMP #$04 
+;	BCS set_plus
+;	LDA #$00
+;	STA ballspeedy_plus
+;	JMP check_ends_done_left
 	
-set_plus:
-	LDA #$02
-	STA ballspeedy_plus
+;set_plus:
+;	LDA #$02
+;	STA ballspeedy_plus
 	
-check_ends_done:	
+;check_ends_done:	
 	LDA #$01
 	STA ballleft
 	LDA #$00
@@ -292,7 +292,7 @@ GameplayMoveBallDown:
   LDA bally
   CLC
   ADC ballspeedy        ;;bally position = bally + ballspeedy
-  ADC ballspeedy_plus
+  ;ADC ballspeedy_plus
   STA bally
 
   LDA bally
